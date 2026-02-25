@@ -228,7 +228,7 @@ export default function Home() {
               {
                 title: "Daily Plan & Targets",
                 desc: "Auto-structured daily tasks with clear checkpoints for CRT + coding.",
-                image: "/team/Plan.png",
+                image: "/team/plan.png",
                 alt: "Daily planner and checklist on laptop",
               },
               {
