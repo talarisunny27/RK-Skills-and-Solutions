@@ -43,7 +43,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen text-gray-900 bg-white">
+    <div className="min-h-screen text-gray-900 bg-white overflow-x-hidden">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
@@ -228,7 +228,7 @@ export default function Home() {
               {
                 title: "Daily Plan & Targets",
                 desc: "Auto-structured daily tasks with clear checkpoints for CRT + coding.",
-                image: "/team/card-Plan.png",
+                image: "/team/Plan.png",
                 alt: "Daily planner and checklist on laptop",
               },
               {

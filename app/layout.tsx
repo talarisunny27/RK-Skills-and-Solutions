@@ -25,6 +25,9 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: 'RK Skills & Solutions — Campus Placement Leaders',
   description: 'Industry-Aligned CRT & Technical Skills Training',
+  icons: {
+    icon: "/team/logo.webp",
+  },
 };
 
 export default function RootLayout({
