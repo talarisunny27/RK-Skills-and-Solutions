@@ -726,15 +726,15 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, ease: [0.215, 0.61, 0.355, 1] }}
-              className="relative rounded-3xl overflow-hidden bg-white border border-gray-200 hover:border-indigo-500 transition-all duration-500 shadow-lg hover:shadow-xl group"
+              className="relative rounded-3xl overflow-hidden bg-white border border-gray-200 hover:border-blue-500 transition-all duration-500 shadow-lg hover:shadow-xl group"
             >
               <div className="p-8 md:p-12 relative z-10">
-                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-indigo-100 text-indigo-800 font-semibold text-sm mb-8">
+                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-blue-100 text-blue-800 font-semibold text-sm mb-8">
                   <span>CHIEF EXECUTIVE OFFICER</span>
-                  <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
                 </div>
 
-                <div className="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-10 rounded-full overflow-hidden border-8 border-indigo-200 group-hover:border-indigo-400 transition-all duration-500 shadow-lg">
+                <div className="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-10 rounded-full overflow-hidden border-8 border-blue-200 group-hover:border-blue-400 transition-all duration-500 shadow-lg">
                   <Image
                     src="/team/RK.jpg"
                     alt="M.K. Radhakrishna - CEO & Founder"
@@ -747,7 +747,7 @@ export default function Home() {
                   />
                 </div>
 
-                <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-indigo-600">
+                <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-blue-600">
                   M.K. Radhakrishna
                 </h2>
 
