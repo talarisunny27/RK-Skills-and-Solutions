@@ -41,6 +41,7 @@ body {
 /* Custom focus ring (accessible) – FIXED */
 .focus-ring {
   @apply ring-2 ring-offset-2 ring-cyan-500/50;
+
   &:focus-visible {
     @apply ring-2 ring-cyan-500 ring-offset-2 ring-offset-[var(--ink)];
   }
@@ -67,29 +68,56 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
 /* Animations */
 @keyframes pulse-slow {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.05); }
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
 }
+
 .animate-pulse-slow {
   animation: pulse-slow 8s infinite ease-in-out;
 }
 
 /* Shine effect */
 @keyframes shine {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
+
 .animate-shine {
   background: linear-gradient(90deg, transparent 0%, rgba(199, 21, 21, 0.15) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shine 3s infinite linear;
 }
-html, body {
+
+html,
+body {
   overflow-x: hidden;
+}
+
+/* Hide Clerk Secured By & Development Mode Badges */
+.cl-internal-1dauvpw,
+.cl-internal-1scxde7,
+.cl-internal-1fpq5at,
+.cl-internal-pe6vm4 {
+  display: none !important;
 }

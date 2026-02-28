@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.38.2",
+    "@clerk/nextjs": "^6.39.0",
     "@gsap/react": "^2.1.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.3",

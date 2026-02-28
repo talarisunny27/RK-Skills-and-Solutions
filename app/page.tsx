@@ -6,9 +6,11 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Trophy, Brain, Clock, BarChart3, Users, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { BookOpen, Building2, Eye, Settings } from "lucide-react";
 import { CalendarDays, Target, Timer, BookOpenCheck, LineChart } from "lucide-react";
-import { Mail, Phone, MapPin, Linkedin, Instagram, Youtube, MessageCircle} from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Instagram, Youtube, MessageCircle } from "lucide-react";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -77,9 +79,16 @@ export default function Home() {
           </div>
 
           {/* CTA Button */}
-          <button className="hidden sm:flex items-center px-7 py-3 text-base font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg">
-            Login / Sign Up
-          </button>
+          <div className="hidden sm:flex items-center gap-4">
+            <SignedOut>
+              <Link href="/sign-in" className="flex items-center px-7 py-3 text-base font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                Login / Sign Up
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </div>
         </div>
       </nav>
 
@@ -698,7 +707,7 @@ export default function Home() {
       {/* CEO */}
       <section ref={addToRefs} id="ceo" className="py-24 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          
+
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -1058,9 +1067,8 @@ export default function Home() {
               ].map((review, idx) => (
                 <div
                   key={idx}
-                  className={`flex-shrink-0 w-80 md:w-96 bg-white border border-gray-200 rounded-3xl p-6 shadow-md hover:shadow-xl transition-all ${
-                    review.isFeatured ? "border-orange-300 bg-orange-50/30" : ""
-                  }`}
+                  className={`flex-shrink-0 w-80 md:w-96 bg-white border border-gray-200 rounded-3xl p-6 shadow-md hover:shadow-xl transition-all ${review.isFeatured ? "border-orange-300 bg-orange-50/30" : ""
+                    }`}
                 >
                   {review.isFeatured && (
                     <div className="flex items-center justify-between mb-4">
@@ -1097,11 +1105,10 @@ export default function Home() {
                     {review.tags.map((tag, i) => (
                       <span
                         key={i}
-                        className={`px-3 py-1 rounded-full text-sm ${
-                          review.isFeatured
-                            ? "bg-orange-100 text-orange-700"
-                            : "bg-blue-50 text-blue-700"
-                        }`}
+                        className={`px-3 py-1 rounded-full text-sm ${review.isFeatured
+                          ? "bg-orange-100 text-orange-700"
+                          : "bg-blue-50 text-blue-700"
+                          }`}
                       >
                         {tag}
                       </span>
@@ -1175,7 +1182,7 @@ export default function Home() {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-orange-200 flex-shrink-0">
                   <Image
-                    src="/team/vivek.jpeg" 
+                    src="/team/vivek.jpeg"
                     alt="Swami Vivekananda"
                     width={64}
                     height={64}
@@ -1207,7 +1214,7 @@ export default function Home() {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-orange-200 flex-shrink-0">
                   <Image
-                    src="/team/bose.jpeg" 
+                    src="/team/bose.jpeg"
                     alt="Subhas Chandra Bose"
                     width={594}
                     height={594}
@@ -1424,161 +1431,161 @@ export default function Home() {
 
       {/* ── Footer ── */}
       {/* ── Footer with Card Blocks ── (light theme) */}
-<footer className="py-16 px-6 bg-gray-50 border-t border-gray-200">
-  <div className="max-w-7xl mx-auto">
-    {/* Three Card Blocks */}
-    <div className="grid lg:grid-cols-3 gap-8 mb-12">
-      {/* Block 1: Company Info */}
-      <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-md hover:shadow-lg transition-all">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-orange-500 flex-shrink-0">
-            <Image
-              src="/team/logo.webp"
-              alt="RK Skills & Solutions Logo"
-              width={64}
-              height={64}
-              className="object-cover"
-            />
+      <footer className="py-16 px-6 bg-gray-50 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto">
+          {/* Three Card Blocks */}
+          <div className="grid lg:grid-cols-3 gap-8 mb-12">
+            {/* Block 1: Company Info */}
+            <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-md hover:shadow-lg transition-all">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-orange-500 flex-shrink-0">
+                  <Image
+                    src="/team/logo.webp"
+                    alt="RK Skills & Solutions Logo"
+                    width={64}
+                    height={64}
+                    className="object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">RK Skills & Solutions</h3>
+                  <p className="text-sm text-gray-600">CRT • Aptitude • Technical Training</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                <span className="px-4 py-1.5 rounded-full bg-orange-100 text-orange-800 text-xs font-medium">
+                  Mock Tests
+                </span>
+                <span className="px-4 py-1.5 rounded-full bg-orange-100 text-orange-800 text-xs font-medium">
+                  Analytics
+                </span>
+                <span className="px-4 py-1.5 rounded-full bg-orange-100 text-orange-800 text-xs font-medium">
+                  Leaderboard
+                </span>
+              </div>
+
+              <p className="text-gray-700 mb-6 leading-relaxed">
+                A comprehensive and placement-focused training ecosystem designed to enhance aptitude, technical proficiency, interview confidence, and consistency through structured practice and systematic progress tracking.
+              </p>
+
+              <div className="mt-6 p-5 rounded-2xl bg-orange-50 border border-orange-200">
+                <p className="text-orange-800 font-medium mb-3">
+                  Want to enroll or partner?
+                </p>
+                <a
+                  href="#contact"
+                  className="inline-flex items-center px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-medium transition-all shadow-md hover:shadow-lg"
+                >
+                  Contact Now →
+                </a>
+                <p className="text-sm text-orange-700 mt-3">
+                  Ping us on WhatsApp for details & demo access.
+                </p>
+              </div>
+            </div>
+
+            {/* Block 2: Quick Links */}
+            <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-md hover:shadow-lg transition-all">
+              <h4 className="text-xl font-bold text-gray-900 mb-6">Quick Links</h4>
+              <ul className="space-y-4 text-gray-700">
+                <li>
+                  <a href="#platform-overview" className="hover:text-orange-600 transition-colors flex items-center gap-2">
+                    → Platform Overview
+                  </a>
+                </li>
+                <li>
+                  <a href="#training-focus" className="hover:text-orange-600 transition-colors flex items-center gap-2">
+                    → Training Focus
+                  </a>
+                </li>
+                <li>
+                  <a href="#student-journey" className="hover:text-orange-600 transition-colors flex items-center gap-2">
+                    → Student Journey
+                  </a>
+                </li>
+                <li>
+                  <a href="#core-team" className="hover:text-orange-600 transition-colors flex items-center gap-2">
+                    → Core Team
+                  </a>
+                </li>
+                <li>
+                  <a href="#contact" className="hover:text-orange-600 transition-colors flex items-center gap-2">
+                    → Contact Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Block 3: Contact + Social */}
+            <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-md hover:shadow-lg transition-all">
+              <h4 className="text-xl font-bold text-gray-900 mb-6">Contact</h4>
+
+              <div className="space-y-5 text-gray-700 mb-8">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-700">
+                    ✉
+                  </span>
+                  <a href="mailto:rkskillsolutions@gmail.com" className="hover:text-orange-600 transition-colors">
+                    rkskillsandsolutions@gmail.com
+                  </a>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xl">
+                    📞
+                  </span>
+                  <a
+                    href="https://wa.me/918341391285"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-green-600 transition-colors"
+                  >
+                    +91 8341391285
+                  </a>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
+                    📍
+                  </span>
+                  <span>Hyderabad, Telangana</span>
+                </div>
+              </div>
+
+              {/* Social Icons */}
+              <div className="mt-6">
+                <h5 className="text-sm font-semibold text-gray-600 mb-4">More</h5>
+                <div className="flex gap-4">
+                  <a href="https://www.linkedin.com/company/rk-skills-and-solutions" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                  <a href="https://www.instagram.com/rkskillsandsolutions?igsh=a3Z0cmdlcndobGtx&utm_source=qr" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
+                    <Instagram className="w-5 h-5" />
+                  </a>
+                  <a href="https://youtube.com/@radhakrishna-i1i4p?si=TIz70Y2c8wIBmnZf" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
+                    <Youtube className="w-5 h-5" />
+                  </a>
+                  <a href="https://wa.me/918341391285" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
+                    <MessageCircle className="w-5 h-5" />
+                  </a>
+                  <a href="#" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
+                    📍
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900">RK Skills & Solutions</h3>
-            <p className="text-sm text-gray-600">CRT • Aptitude • Technical Training</p>
+
+          {/* Bottom copyright + tagline */}
+          <div className="border-t border-gray-200 pt-8 mt-8 text-center text-gray-600 text-sm">
+            <p>© 2026 RK Skills & Solutions. All Rights Reserved.</p>
+            <p className="mt-2">
+              Built for placement excellence • Consistency • Confidence
+            </p>
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2 mb-6">
-          <span className="px-4 py-1.5 rounded-full bg-orange-100 text-orange-800 text-xs font-medium">
-            Mock Tests
-          </span>
-          <span className="px-4 py-1.5 rounded-full bg-orange-100 text-orange-800 text-xs font-medium">
-            Analytics
-          </span>
-          <span className="px-4 py-1.5 rounded-full bg-orange-100 text-orange-800 text-xs font-medium">
-            Leaderboard
-          </span>
-        </div>
-
-        <p className="text-gray-700 mb-6 leading-relaxed">
-          A comprehensive and placement-focused training ecosystem designed to enhance aptitude, technical proficiency, interview confidence, and consistency through structured practice and systematic progress tracking.
-        </p>
-
-        <div className="mt-6 p-5 rounded-2xl bg-orange-50 border border-orange-200">
-          <p className="text-orange-800 font-medium mb-3">
-            Want to enroll or partner?
-          </p>
-          <a
-            href="#contact"
-            className="inline-flex items-center px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-medium transition-all shadow-md hover:shadow-lg"
-          >
-            Contact Now →
-          </a>
-          <p className="text-sm text-orange-700 mt-3">
-            Ping us on WhatsApp for details & demo access.
-          </p>
-        </div>
-      </div>
-
-      {/* Block 2: Quick Links */}
-      <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-md hover:shadow-lg transition-all">
-        <h4 className="text-xl font-bold text-gray-900 mb-6">Quick Links</h4>
-        <ul className="space-y-4 text-gray-700">
-          <li>
-            <a href="#platform-overview" className="hover:text-orange-600 transition-colors flex items-center gap-2">
-              → Platform Overview
-            </a>
-          </li>
-          <li>
-            <a href="#training-focus" className="hover:text-orange-600 transition-colors flex items-center gap-2">
-              → Training Focus
-            </a>
-          </li>
-          <li>
-            <a href="#student-journey" className="hover:text-orange-600 transition-colors flex items-center gap-2">
-              → Student Journey
-            </a>
-          </li>
-          <li>
-            <a href="#core-team" className="hover:text-orange-600 transition-colors flex items-center gap-2">
-              → Core Team
-            </a>
-          </li>
-          <li>
-            <a href="#contact" className="hover:text-orange-600 transition-colors flex items-center gap-2">
-              → Contact Us
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* Block 3: Contact + Social */}
-      <div className="bg-white rounded-3xl border border-gray-200 p-8 shadow-md hover:shadow-lg transition-all">
-        <h4 className="text-xl font-bold text-gray-900 mb-6">Contact</h4>
-
-        <div className="space-y-5 text-gray-700 mb-8">
-          <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-700">
-              ✉
-            </span>
-            <a href="mailto:rkskillsolutions@gmail.com" className="hover:text-orange-600 transition-colors">
-              rkskillsandsolutions@gmail.com
-            </a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xl">
-              📞
-            </span>
-            <a
-              href="https://wa.me/918341391285"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-green-600 transition-colors"
-            >
-              +91 8341391285
-            </a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
-              📍
-            </span>
-            <span>Hyderabad, Telangana</span>
-          </div>
-        </div>
-
-        {/* Social Icons */}
-        <div className="mt-6">
-          <h5 className="text-sm font-semibold text-gray-600 mb-4">More</h5>
-          <div className="flex gap-4">
-            <a href="https://www.linkedin.com/company/rk-skills-and-solutions" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
-              <Linkedin className="w-5 h-5" />
-            </a>
-            <a href="https://www.instagram.com/rkskillsandsolutions?igsh=a3Z0cmdlcndobGtx&utm_source=qr" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
-              <Instagram className="w-5 h-5" />
-            </a>
-            <a href="https://youtube.com/@radhakrishna-i1i4p?si=TIz70Y2c8wIBmnZf" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
-              <Youtube className="w-5 h-5" />
-            </a>
-            <a href="https://wa.me/918341391285" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
-              <MessageCircle className="w-5 h-5" />
-            </a>
-            <a href="#" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
-              📍
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {/* Bottom copyright + tagline */}
-    <div className="border-t border-gray-200 pt-8 mt-8 text-center text-gray-600 text-sm">
-      <p>© 2026 RK Skills & Solutions. All Rights Reserved.</p>
-      <p className="mt-2">
-        Built for placement excellence • Consistency • Confidence
-      </p>
-    </div>
-  </div>
-</footer>
+      </footer>
     </div>
   );
 }
