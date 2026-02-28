@@ -882,13 +882,13 @@ export default function Home() {
               {
                 name: "Giriyam Sai Narasimha",
                 role: "Chief Advisory Officer (CAO)",
-                bio: "IIT Alumni",
+                bio: "IIT Alumnus",
                 imgPlaceholder: "/team/sai.jpeg",
               },
               {
                 name: "Talari Venkata Sunny",
                 role: "Chief Technology Officer (CTO)",
-                bio: "Head of Technical Wing All Over India, IIT alumni. Builds our platform, AI features & personalized learning engine.",
+                bio: "Head of Technical Wing All Over India, IIT alumnus. Builds our platform, AI features & personalized learning engine.",
                 imgPlaceholder: "/team/1.jpg",
               },
               {
@@ -900,7 +900,7 @@ export default function Home() {
               {
                 name: "M.K.Pavani Krishna",
                 role: "Cofounder",
-                bio: "Chief Strategist, IIM alumni. Leads overall vision, content strategy & mentorship.",
+                bio: "Chief Strategist, IIM alumna. Leads overall vision, content strategy & mentorship.",
                 imgPlaceholder: "/team/4.jpg",
               },
             ].map((member, i) => (
