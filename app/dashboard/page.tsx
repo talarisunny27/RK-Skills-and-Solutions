@@ -26,7 +26,6 @@ const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
     { label: "Assessments", icon: ClipboardList, href: "/assessments" },
     { label: "Results", icon: BarChart2, href: "/results" },
-    { label: "Change Password", icon: KeyRound, href: "/change-password" },
 ];
 
 export default function DashboardPage() {
@@ -174,15 +173,14 @@ export default function DashboardPage() {
                         >
                             <Menu className="w-6 h-6" />
                         </button>
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
-                                <GraduationCap className="w-4 h-4 text-white" />
-                            </div>
+                        <Link href="/" className="flex items-center gap-2 group">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src="/team/logo.webp" alt="RK Skills Logo" className="w-10 h-10 object-contain rounded-full" />
                             <div className="hidden sm:block">
-                                <p className="font-bold text-gray-900 text-sm leading-tight">RK Skills Portal</p>
+                                <p className="font-bold text-gray-900 text-sm leading-tight group-hover:text-indigo-600 transition-colors">RK Skills Portal</p>
                                 <p className="text-xs text-gray-400">Daily tests • Results • Leaderboard</p>
                             </div>
-                        </div>
+                        </Link>
                     </div>
 
                     <div className="flex items-center gap-3">

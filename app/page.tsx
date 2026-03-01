@@ -77,6 +77,12 @@ export default function Home() {
             <a href="#features" className="hover:text-indigo-600 transition-colors duration-300">Features</a>
             <a href="#how-it-works" className="hover:text-indigo-600 transition-colors duration-300">How It Works</a>
             <a href="#contact" className="hover:text-indigo-600 transition-colors duration-300">Contact</a>
+            <SignedIn>
+              <Link href="/dashboard" className="hover:text-indigo-600 transition-colors duration-300">Dashboard</Link>
+            </SignedIn>
+            <SignedOut>
+              <Link href="/sign-in" className="hover:text-indigo-600 transition-colors duration-300">Dashboard</Link>
+            </SignedOut>
           </div>
 
           {/* CTA Button */}
@@ -87,7 +93,7 @@ export default function Home() {
               </Link>
             </SignedOut>
             <SignedIn>
-              <UserButton />
+              <UserButton appearance={{ elements: { avatarBox: "w-14 h-14" } }} />
             </SignedIn>
           </div>
 
@@ -110,15 +116,18 @@ export default function Home() {
               <a href="#how-it-works" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>How It Works</a>
               <a href="#contact" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
 
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-4 border-t border-gray-100 space-y-3">
                 <SignedOut>
                   <Link href="/sign-in" className="w-full flex justify-center items-center px-7 py-3 text-lg font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow-md" onClick={() => setIsMobileMenuOpen(false)}>
                     Login / Sign Up
                   </Link>
                 </SignedOut>
                 <SignedIn>
+                  <Link href="/dashboard" className="w-full flex justify-center items-center px-7 py-3 text-lg font-semibold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all duration-300 shadow-md" onClick={() => setIsMobileMenuOpen(false)}>
+                    Dashboard
+                  </Link>
                   <div className="px-2 flex items-center justify-between">
-                    <span className="text-gray-700 text-lg font-medium">Account</span>
+                    <span className="text-gray-700 text-base font-medium">Account</span>
                     <UserButton />
                   </div>
                 </SignedIn>
