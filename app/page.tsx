@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Trophy, Brain, Clock, BarChart3, Users, CheckCircle2 } from "lucide-react";
@@ -9,13 +9,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { BookOpen, Building2, Eye, Settings } from "lucide-react";
 import { CalendarDays, Target, Timer, BookOpenCheck, LineChart } from "lucide-react";
-import { Mail, Phone, MapPin, Linkedin, Instagram, Youtube, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Instagram, Youtube, MessageCircle, Menu, X } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     sectionsRef.current.forEach((section) => {
@@ -50,8 +51,8 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           {/* Logo + Brand Name */}
-          <a href="/" className="flex items-center gap-4 group">
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-rose-500 group-hover:border-rose-400 transition-all duration-500 shadow-md">
+          <a href="/" className="flex items-center gap-2 sm:gap-4 group">
+            <div className="relative w-10 h-10 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-rose-500 group-hover:border-rose-400 transition-all duration-500 shadow-md flex-shrink-0">
               <Image
                 src="/team/logo.webp"
                 alt="RK Skills and Solutions Logo"
@@ -62,24 +63,24 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-black-600 group-hover:text-black-700 transition-colors">
+              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-black-600 group-hover:text-black-700 transition-colors">
                 RK SKILLS AND SOLUTIONS
               </h1>
-              <span className="text-xs sm:text-sm md:text-base font-medium text-gray-600">
+              <span className="hidden sm:block text-xs sm:text-sm md:text-base font-medium text-gray-600">
                 Industry-Aligned CRT & Technical Skills Training
               </span>
             </div>
           </a>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center gap-10 text-gray-700 font-medium">
+          <div className="hidden lg:flex items-center gap-10 text-gray-700 font-medium">
             <a href="#features" className="hover:text-indigo-600 transition-colors duration-300">Features</a>
             <a href="#how-it-works" className="hover:text-indigo-600 transition-colors duration-300">How It Works</a>
             <a href="#contact" className="hover:text-indigo-600 transition-colors duration-300">Contact</a>
           </div>
 
           {/* CTA Button */}
-          <div className="hidden sm:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <SignedOut>
               <Link href="/sign-in" className="flex items-center px-7 py-3 text-base font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg">
                 Login / Sign Up
@@ -89,7 +90,42 @@ export default function Home() {
               <UserButton />
             </SignedIn>
           </div>
+
+          {/* Mobile Menu Button */}
+          <div className="lg:hidden flex items-center">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-gray-700 hover:text-indigo-600 focus:outline-none p-2"
+            >
+              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg absolute w-full max-h-[calc(100vh-80px)] overflow-y-auto">
+            <div className="px-4 py-6 space-y-4 flex flex-col">
+              <a href="#features" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
+              <a href="#how-it-works" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>How It Works</a>
+              <a href="#contact" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
+
+              <div className="pt-4 border-t border-gray-100">
+                <SignedOut>
+                  <Link href="/sign-in" className="w-full flex justify-center items-center px-7 py-3 text-lg font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow-md" onClick={() => setIsMobileMenuOpen(false)}>
+                    Login / Sign Up
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <div className="px-2 flex items-center justify-between">
+                    <span className="text-gray-700 text-lg font-medium">Account</span>
+                    <UserButton />
+                  </div>
+                </SignedIn>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero */}
@@ -112,7 +148,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 1 }}
-                className="text-4xl md:text-5xl lg:text-4xl xl:text-6xl font-extrabold tracking-tight mb-8 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-orange-700 via-orange-600 to-indigo-600"
+                className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight mb-6 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-orange-700 via-orange-600 to-indigo-600 lg:text-left text-center"
               >
                 Develop placement confidence with advanced CRT and technical skills,
                 <br />
@@ -123,7 +159,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.9 }}
-                className="text-lg md:text-xl lg:text-2xl text-gray-700 max-w-3xl mx-auto lg:mx-0 mb-12 leading-relaxed"
+                className="text-lg md:text-xl lg:text-2xl text-gray-700 max-w-3xl mx-auto lg:mx-0 mb-12 leading-relaxed lg:text-left text-center"
               >
                 An integrated learning platform that enables daily practice, mock assessments, real-time results, and continuous improvement—built for seamless adoption across college batches.
               </motion.p>
@@ -208,9 +244,9 @@ export default function Home() {
       </section>
 
       {/* Platform Features */}
-      <section ref={addToRefs} id="platform-features" className="py-24 px-6 bg-gray-50">
+      <section ref={addToRefs} id="platform-features" className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 md:mb-16">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -328,10 +364,10 @@ export default function Home() {
       </section>
 
       {/* ── Training Focus ── (light theme) */}
-      <section ref={addToRefs} className="py-20 px-6 bg-white">
+      <section ref={addToRefs} className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           {/* Top badge + headline */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 md:mb-16">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -531,10 +567,10 @@ export default function Home() {
       </section>
 
       {/* ── Student Journey  */}
-      <section ref={addToRefs} className="py-20 px-6 bg-gray-50">
+      <section ref={addToRefs} className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           {/* Top badge + headline */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 md:mb-16">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}

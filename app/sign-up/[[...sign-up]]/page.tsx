@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function SignUpPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-50 to-purple-400 p-4 sm:p-8 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 via-blue-50 to-blue-400 p-4 sm:p-8 relative overflow-hidden">
             <div className="flex w-full max-w-5xl rounded-[2rem] overflow-hidden shadow-2xl bg-white min-h-[600px] relative z-10">
 
                 {/* Left Side Container */}
@@ -41,19 +41,21 @@ export default function SignUpPage() {
                         <p className="text-gray-500 text-sm mb-6">Sign up to get started</p>
 
                         <SignUp
+                            afterSignUpUrl="/dashboard"
                             appearance={{
                                 elements: {
-                                    rootBox: 'w-full max-w-none',
+                                    rootBox: 'w-full max-w-none flex justify-center',
                                     cardBox: 'w-full max-w-none',
                                     card: 'shadow-none w-full max-w-none bg-transparent p-0 flex flex-col',
                                     header: 'hidden',
+                                    main: 'w-full px-1',
                                     socialButtonsBlockButton: 'border-gray-200 text-gray-700 hover:bg-gray-50',
-                                    formButtonPrimary: 'bg-[#cc5f6d] hover:bg-[#b04b58] shadow-md text-white rounded-full py-3 mt-2 font-semibold text-lg hover:shadow-lg transition-all',
-                                    formFieldInput: 'rounded-full border-gray-200 py-3 px-5',
+                                    formButtonPrimary: 'bg-[#cc5f6d] hover:bg-[#b04b58] shadow-md text-white rounded-full py-3 mt-2 font-semibold text-lg hover:shadow-lg transition-all w-full',
+                                    formFieldInput: 'rounded-full border-gray-200 py-3 px-5 w-full box-border',
                                     footerAction: 'justify-center',
                                     footer: 'bg-transparent border-0 pt-6',
                                     dividerRow: 'my-6',
-                                    formFieldLabel: 'text-sm font-medium text-gray-700 ml-2 mb-1'
+                                    formFieldLabel: 'text-sm font-medium text-gray-700 ml-2 mb-1 block'
                                 }
                             }}
                         />
