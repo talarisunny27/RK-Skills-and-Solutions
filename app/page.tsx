@@ -10,13 +10,44 @@ import Link from "next/link";
 import { BookOpen, Building2, Eye, Settings } from "lucide-react";
 import { CalendarDays, Target, Timer, BookOpenCheck, LineChart } from "lucide-react";
 import { Mail, Phone, MapPin, Linkedin, Instagram, Youtube, MessageCircle, Menu, X } from "lucide-react";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/nextjs";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
+  const { user } = useUser();
+  const role = (user?.publicMetadata as any)?.role;
+  const dashboardHref = role === "admin" ? "/admin" : "/dashboard";
+
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Enquiry form state
+  const [enquiry, setEnquiry] = useState({ name: "", mobile: "", email: "", interested: "", message: "" });
+  const [enquiryLoading, setEnquiryLoading] = useState(false);
+  const [enquirySuccess, setEnquirySuccess] = useState(false);
+  const [enquiryError, setEnquiryError] = useState("");
+
+  const handleEnquirySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEnquiryLoading(true);
+    setEnquiryError("");
+    try {
+      const res = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(enquiry),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send");
+      setEnquirySuccess(true);
+      setEnquiry({ name: "", mobile: "", email: "", interested: "", message: "" });
+    } catch (err: any) {
+      setEnquiryError(err.message);
+    } finally {
+      setEnquiryLoading(false);
+    }
+  };
 
   useEffect(() => {
     sectionsRef.current.forEach((section) => {
@@ -75,10 +106,10 @@ export default function Home() {
           {/* Desktop Links */}
           <div className="hidden lg:flex items-center gap-10 text-gray-700 font-medium">
             <a href="#features" className="hover:text-indigo-600 transition-colors duration-300">Features</a>
-            <a href="#how-it-works" className="hover:text-indigo-600 transition-colors duration-300">How It Works</a>
+            <a href="#team" className="hover:text-indigo-600 transition-colors duration-300">Team</a>
             <a href="#contact" className="hover:text-indigo-600 transition-colors duration-300">Contact</a>
             <SignedIn>
-              <Link href="/dashboard" className="hover:text-indigo-600 transition-colors duration-300">Dashboard</Link>
+              <Link href={dashboardHref} className="hover:text-indigo-600 transition-colors duration-300">Dashboard</Link>
             </SignedIn>
             <SignedOut>
               <Link href="/sign-in" className="hover:text-indigo-600 transition-colors duration-300">Dashboard</Link>
@@ -113,7 +144,7 @@ export default function Home() {
           <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg absolute w-full max-h-[calc(100vh-80px)] overflow-y-auto">
             <div className="px-4 py-6 space-y-4 flex flex-col">
               <a href="#features" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
-              <a href="#how-it-works" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>How It Works</a>
+              <a href="#team" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Team</a>
               <a href="#contact" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
 
               <div className="pt-4 border-t border-gray-100 space-y-3">
@@ -123,7 +154,7 @@ export default function Home() {
                   </Link>
                 </SignedOut>
                 <SignedIn>
-                  <Link href="/dashboard" className="w-full flex justify-center items-center px-7 py-3 text-lg font-semibold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all duration-300 shadow-md" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href={dashboardHref} className="w-full flex justify-center items-center px-7 py-3 text-lg font-semibold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition-all duration-300 shadow-md" onClick={() => setIsMobileMenuOpen(false)}>
                     Dashboard
                   </Link>
                   <div className="px-2 flex items-center justify-between">
@@ -179,9 +210,16 @@ export default function Home() {
                 transition={{ delay: 0.9, duration: 1 }}
                 className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start"
               >
-                <button className="px-10 py-5 text-xl font-bold rounded-xl bg-red-600 hover:bg-red-700 text-white transition-all shadow-lg hover:shadow-red-500/40 hover:scale-105">
-                  Enroll Now →
-                </button>
+                <SignedOut>
+                  <Link href="/sign-in" className="px-10 py-5 text-xl font-bold rounded-xl bg-red-600 hover:bg-red-700 text-white transition-all shadow-lg hover:shadow-red-500/40 hover:scale-105">
+                    Enroll Now →
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <Link href={dashboardHref} className="px-10 py-5 text-xl font-bold rounded-xl bg-red-600 hover:bg-red-700 text-white transition-all shadow-lg hover:shadow-red-500/40 hover:scale-105">
+                    Go to Dashboard →
+                  </Link>
+                </SignedIn>
                 <button className="px-10 py-5 text-xl font-bold rounded-xl border-2 border-blue-600 text-blue-700 hover:bg-blue-50 transition-all">
                   Platform Features
                 </button>
@@ -743,9 +781,16 @@ export default function Home() {
           <p className="text-2xl text-gray-600 mb-12">
             Join thousands of students transforming their placement game – daily.
           </p>
-          <button className="px-12 py-7 text-2xl font-bold rounded-2xl bg-red-600 hover:bg-red-700 text-white transition-all shadow-xl hover:shadow-red-500/30 hover:scale-105">
-            Start Your Journey Today – It's Free
-          </button>
+          <SignedOut>
+            <Link href="/sign-in" className="inline-block px-12 py-7 text-2xl font-bold rounded-2xl bg-red-600 hover:bg-red-700 text-white transition-all shadow-xl hover:shadow-red-500/30 hover:scale-105">
+              Start Your Journey Today – It&apos;s Free
+            </Link>
+          </SignedOut>
+          <SignedIn>
+            <Link href={dashboardHref} className="inline-block px-12 py-7 text-2xl font-bold rounded-2xl bg-red-600 hover:bg-red-700 text-white transition-all shadow-xl hover:shadow-red-500/30 hover:scale-105">
+              Go to Dashboard →
+            </Link>
+          </SignedIn>
         </div>
       </section>
 
@@ -1343,17 +1388,17 @@ export default function Home() {
 
               <div className="flex flex-col gap-4">
                 <a
-                  href="mailto:rkskillsandsolutions@gmail.com"
+                  href="mailto:rkskillsandsolution@gmail.com"
                   className="flex items-center gap-3 text-gray-700 hover:text-orange-600 transition-colors"
                 >
                   <span className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-orange-600">
                     ✉
                   </span>
-                  rkskillsandsolutions@gmail.com
+                  rkskillsandsolution@gmail.com
                 </a>
 
                 <a
-                  href="https://wa.me/918341391285"
+                  href="https://wa.me/919550465533"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors"
@@ -1361,7 +1406,7 @@ export default function Home() {
                   <span className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xl">
                     💬
                   </span>
-                  +91 8341391285
+                  +91 9550465533
                 </a>
               </div>
             </motion.div>
@@ -1382,93 +1427,137 @@ export default function Home() {
                 We'll respond quickly with details.
               </p>
 
-              <form className="space-y-6">
-                {/* Name + Mobile */}
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
-                      placeholder="Enter your full name"
-                      required
-                    />
+              {/* Success State */}
+              {enquirySuccess ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
+                  <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-9 h-9 text-emerald-600" />
                   </div>
-
-                  <div>
-                    <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-2">
-                      Mobile Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="mobile"
-                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
-                      placeholder="+91 XXXXXXXXXX"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
-                    placeholder="your.email@example.com"
-                    required
-                  />
-                </div>
-
-                {/* Interested In (dropdown) */}
-                <div>
-                  <label htmlFor="interested" className="block text-sm font-medium text-gray-700 mb-2">
-                    Interested In
-                  </label>
-                  <select
-                    id="interested"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                  <h4 className="text-2xl font-bold text-gray-900">Enquiry Sent!</h4>
+                  <p className="text-gray-600 max-w-xs">We&apos;ve received your message and will call you back shortly on <strong>{enquiry.mobile || "your number"}</strong>.</p>
+                  <button
+                    onClick={() => setEnquirySuccess(false)}
+                    className="mt-2 px-6 py-3 rounded-xl border border-orange-300 text-orange-600 font-semibold hover:bg-orange-50 transition-all"
                   >
-                    <option value="">Select option</option>
-                    <option value="batch-timing">Batch Timings & Demo</option>
-                    <option value="college-plan">College Batch Plan</option>
-                    <option value="individual">Individual Enrollment</option>
-                    <option value="other">Other Enquiry</option>
-                  </select>
+                    Send Another Enquiry
+                  </button>
                 </div>
+              ) : (
+                <form className="space-y-6" onSubmit={handleEnquirySubmit}>
+                  {/* Name + Mobile */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                        placeholder="Enter your full name"
+                        required
+                        value={enquiry.name}
+                        onChange={(e) => setEnquiry({ ...enquiry, name: e.target.value })}
+                      />
+                    </div>
 
-                {/* Message */}
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Write your message...
-                  </label>
-                  <textarea
-                    id="message"
-                    rows={4}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
-                    placeholder="Tell us about your requirements or questions..."
-                  ></textarea>
-                </div>
+                    <div>
+                      <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-2">
+                        Mobile Number
+                      </label>
+                      <input
+                        type="tel"
+                        id="mobile"
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                        placeholder="+91 XXXXXXXXXX"
+                        required
+                        value={enquiry.mobile}
+                        onChange={(e) => setEnquiry({ ...enquiry, mobile: e.target.value })}
+                      />
+                    </div>
+                  </div>
 
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  className="w-full px-8 py-5 text-lg font-bold rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white transition-all shadow-lg hover:shadow-orange-500/30 flex items-center justify-center gap-3"
-                >
-                  <span>Submit Enquiry</span>
-                  <span>→</span>
-                </button>
+                  {/* Email */}
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                      placeholder="your.email@example.com"
+                      required
+                      value={enquiry.email}
+                      onChange={(e) => setEnquiry({ ...enquiry, email: e.target.value })}
+                    />
+                  </div>
 
-                <p className="text-center text-sm text-gray-500 mt-4">
-                  Your details are safe and never shared.
-                </p>
-              </form>
+                  {/* Interested In (dropdown) */}
+                  <div>
+                    <label htmlFor="interested" className="block text-sm font-medium text-gray-700 mb-2">
+                      Interested In
+                    </label>
+                    <select
+                      id="interested"
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                      value={enquiry.interested}
+                      onChange={(e) => setEnquiry({ ...enquiry, interested: e.target.value })}
+                    >
+                      <option value="">Select option</option>
+                      <option value="batch-timing">Batch Timings &amp; Demo</option>
+                      <option value="college-plan">College Batch Plan</option>
+                      <option value="individual">Individual Enrollment</option>
+                      <option value="other">Other Enquiry</option>
+                    </select>
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                      Write your message...
+                    </label>
+                    <textarea
+                      id="message"
+                      rows={4}
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                      placeholder="Tell us about your requirements or questions..."
+                      value={enquiry.message}
+                      onChange={(e) => setEnquiry({ ...enquiry, message: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Error message */}
+                  {enquiryError && (
+                    <div className="px-4 py-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm font-medium">
+                      ⚠️ {enquiryError}
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={enquiryLoading}
+                    className="w-full px-8 py-5 text-lg font-bold rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white transition-all shadow-lg hover:shadow-orange-500/30 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {enquiryLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Submit Enquiry</span>
+                        <span>→</span>
+                      </>
+                    )}
+                  </button>
+
+                  <p className="text-center text-sm text-gray-500 mt-4">
+                    Your details are safe and never shared.
+                  </p>
+                </form>
+              )}
             </motion.div>
           </div>
         </div>
