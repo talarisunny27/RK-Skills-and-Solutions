@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 // Admin uploads a question paper (Excel or PDF) for a specific assessment.
 // Streams the file directly to the Java backend.
@@ -14,7 +15,7 @@ export async function POST(
 
         const formData = await req.formData();
         const backendResponse = await fetch(
-            `http://localhost:8080/api/v1/exam/${assessmentId}/upload`,
+            `${API_BASE_URL}/api/v1/exam/${assessmentId}/upload`,
             {
                 method: "POST",
                 body: formData, // forward the multipart file as-is

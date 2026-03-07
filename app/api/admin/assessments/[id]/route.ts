@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 async function checkAdmin() {
     const { sessionClaims } = await auth();
@@ -22,7 +23,7 @@ export async function PUT(
         const id = (await params).id;
         const body = await request.json();
 
-        const res = await fetch(`http://localhost:8080/api/v1/assessments/admin/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/assessments/admin/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
@@ -46,7 +47,7 @@ export async function DELETE(
         await checkAdmin();
         const id = (await params).id;
 
-        const res = await fetch(`http://localhost:8080/api/v1/assessments/admin/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/assessments/admin/${id}`, {
             method: "DELETE",
         });
 

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 export async function GET() {
     try {
@@ -13,7 +14,7 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
-        const res = await fetch("http://localhost:8080/api/v1/dashboard/admin", {
+        const res = await fetch(`${API_BASE_URL}/api/v1/dashboard/admin`, {
             cache: "no-store",
         });
 

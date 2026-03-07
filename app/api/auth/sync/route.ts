@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,7 +10,7 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { email, name, college } = body;
 
-        const backendResponse = await fetch("http://localhost:8080/api/v1/users/sync", {
+        const backendResponse = await fetch(`${API_BASE_URL}/api/v1/users/sync`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: userId, email, name, college }),

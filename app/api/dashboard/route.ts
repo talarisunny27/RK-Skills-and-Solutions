@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { DashboardStats } from "@/app/lib/types";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 export async function GET() {
     try {
@@ -19,7 +20,7 @@ export async function GET() {
 
                 const college = (user.publicMetadata?.college as string) || "TKR College";
 
-                await fetch("http://localhost:8080/api/v1/users/sync", {
+                await fetch(`${API_BASE_URL}/api/v1/users/sync`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id: userId, email, name, college }),
@@ -31,7 +32,7 @@ export async function GET() {
         }
 
         const response = await fetch(
-            `http://localhost:8080/api/v1/dashboard/${userId}`,
+            `${API_BASE_URL}/api/v1/dashboard/${userId}`,
             {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },

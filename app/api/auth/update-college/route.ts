@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 export async function POST(req: NextRequest) {
     try {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
         if (user) {
             const email = user.emailAddresses[0]?.emailAddress ?? "";
             const name = user.fullName ?? user.firstName ?? "Unknown";
-            await fetch("http://localhost:8080/api/v1/users/sync", {
+            await fetch(`${API_BASE_URL}/api/v1/users/sync`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: userId, email, name, college: collegeName }),

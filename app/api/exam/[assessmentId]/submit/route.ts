@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 export async function POST(
     req: NextRequest,
@@ -13,7 +14,7 @@ export async function POST(
         const body = await req.json();
 
         const response = await fetch(
-            `http://localhost:8080/api/v1/exam/${assessmentId}/submit`,
+            `${API_BASE_URL}/api/v1/exam/${assessmentId}/submit`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
 import { Assessment } from "@/app/lib/types";
 import { auth } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 export async function GET() {
     try {
         const { userId, sessionClaims } = await auth();
-        
+
         if (!userId) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
         const college = (sessionClaims?.metadata as any)?.college || (sessionClaims as any)?.publicMetadata?.college || "ALL";
 
-        const response = await fetch(`http://localhost:8080/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

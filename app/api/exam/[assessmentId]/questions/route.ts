@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 export async function GET(
     _req: Request,
@@ -13,7 +14,7 @@ export async function GET(
         const college = (sessionClaims?.metadata as any)?.college || (sessionClaims as any)?.publicMetadata?.college || "ALL";
 
         const response = await fetch(
-            `http://localhost:8080/api/v1/exam/${assessmentId}/questions?college=${encodeURIComponent(college)}`,
+            `${API_BASE_URL}/api/v1/exam/${assessmentId}/questions?college=${encodeURIComponent(college)}`,
             { cache: "no-store" }
         );
 

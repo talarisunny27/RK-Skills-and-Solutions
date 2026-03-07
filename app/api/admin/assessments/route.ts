@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { API_BASE_URL } from "@/app/lib/api";
 
 async function checkAdmin() {
     const { sessionClaims } = await auth();
@@ -16,7 +17,7 @@ async function checkAdmin() {
 export async function GET() {
     try {
         await checkAdmin();
-        const res = await fetch("http://localhost:8080/api/v1/assessments/admin/all", {
+        const res = await fetch(`${API_BASE_URL}/api/v1/assessments/admin/all`, {
             cache: "no-store",
         });
         if (!res.ok) throw new Error(`Backend returned ${res.status}`);
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
     try {
         await checkAdmin();
         const body = await request.json();
-        const res = await fetch("http://localhost:8080/api/v1/assessments/admin", {
+        const res = await fetch(`${API_BASE_URL}/api/v1/assessments/admin`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
