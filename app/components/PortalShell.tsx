@@ -11,6 +11,7 @@ import {
     LogOut,
     GraduationCap,
     Menu,
+    Trophy,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -18,6 +19,7 @@ const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
     { label: "Assessments", icon: ClipboardList, href: "/assessments" },
     { label: "Results", icon: BarChart2, href: "/results" },
+    { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
 ];
 
 export default function PortalShell({ children }: { children: React.ReactNode }) {

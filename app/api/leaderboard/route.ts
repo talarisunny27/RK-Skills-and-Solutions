@@ -1,0 +1,23 @@
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+
+export async function GET() {
+    try {
+        const { userId } = await auth();
+        if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+
+        const response = await fetch("http://localhost:8080/api/v1/leaderboard", {
+            cache: "no-store",
+        });
+
+        if (!response.ok) {
+            throw new Error(`Backend leaderboard fetch failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
+    } catch (error: any) {
+        console.error("Leaderboard proxy error:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}

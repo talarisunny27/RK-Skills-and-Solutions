@@ -72,3 +72,32 @@ export interface ResultsData {
     activityFeed: AttemptResult[];
 }
 export type Filter = "All" | "Upcoming" | "Not Attempted" | "Attempted";
+
+export interface ExamQuestion {
+    id: number;
+    assessmentId: number;
+    section: string;
+    text: string;
+    optionA: string;
+    optionB: string;
+    optionC: string;
+    optionD: string;
+    difficulty: string;
+}
+
+export interface QuestionResult {
+    questionId: number;
+    userAnswer: string | null;
+    correctAnswer: string;
+    isCorrect: boolean;
+}
+
+export interface ExamSubmitResponse {
+    score: number;
+    rightAnswers: number;
+    wrongAnswers: number;
+    totalQuestions: number;
+    percentage: string;
+    results: QuestionResult[];
+}
+

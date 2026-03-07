@@ -2,7 +2,9 @@
 import type { Metadata } from 'next';
 import { DM_Sans, Syne, Space_Mono } from 'next/font/google';
 import './globals.css';
-import { Providers } from './providers'; // ← new import
+import { Providers } from './providers';
+import SyncUser from './components/SyncUser';
+import CollegeOnboarding from './components/CollegeOnboarding';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -39,10 +41,14 @@ export default function RootLayout({
     <html lang="en" className={`${dmSans.variable} ${syne.variable} ${spaceMono.variable}`}>
       <head>
         <meta name="theme-color" content="#060913" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className="antialiased bg-[#060913] text-[#EAF2FF] min-h-screen">
-        <Providers>{children}</Providers>
+        <Providers>
+          <SyncUser />
+          <CollegeOnboarding />
+          {children}
+        </Providers>
       </body>
     </html>
   );

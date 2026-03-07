@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import PortalShell from "@/app/components/PortalShell";
 import {
     Search,
@@ -26,6 +27,7 @@ const filterIcons: Record<Filter, React.ReactNode> = {
     Attempted: <CheckCircle2 className="w-4 h-4" />,
 };
 
+
 const statusColors: Record<string, string> = {
     "Not Attempted": "bg-gray-100 text-gray-600 border-gray-200",
     Upcoming: "bg-blue-50 text-blue-600 border-blue-200",
@@ -33,6 +35,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AssessmentsPage() {
+    const router = useRouter();
     const [activeFilter, setActiveFilter] = useState<Filter>("All");
     const [search, setSearch] = useState("");
     const [tests, setTests] = useState<Assessment[]>([]);
@@ -210,6 +213,9 @@ export default function AssessmentsPage() {
                                         <p className="text-[10px] text-gray-400 line-clamp-1 flex-1 mr-2">{test.description}</p>
                                         <button
                                             disabled={test.status === "Attempted" || test.status === "Upcoming"}
+                                            onClick={() => {
+                                                if (test.status === "Not Attempted") router.push(`/exam/${test.id}`);
+                                            }}
                                             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-sm
                                                 ${test.status === "Attempted" ? "bg-emerald-500" : test.status === "Upcoming" ? "bg-slate-300" : "bg-indigo-600 hover:bg-indigo-700 active:scale-95 hover:shadow-md"}`}
                                         >

@@ -1,266 +1,272 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
-    Plus,
-    Search,
-    Filter,
-    Trash2,
-    Edit2,
-    XCircle,
-    UploadCloud,
+    Search, Filter, Trash2, Edit2, UploadCloud, FileSpreadsheet,
+    CheckCircle2, AlertCircle, X, RefreshCw, FileText, ChevronDown
 } from "lucide-react";
-import { CollegeLevel, Question } from "@/app/lib/types";
-
-const colleges: CollegeLevel[] = ["KMIT", "CBIT", "MGIT", "ALL"];
-const difficulties = ["Easy", "Medium", "Hard"];
+import { Assessment, ExamQuestion } from "@/app/lib/types";
 
 export default function AdminQuestions() {
-    const [selectedCollege, setSelectedCollege] = useState<CollegeLevel>("ALL");
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [isAdding, setIsAdding] = useState(false);
-    const [newQuestion, setNewQuestion] = useState<Question>({
-        text: "",
-        options: ["", "", "", ""],
-        correctAnswer: "A",
-        difficulty: "Medium",
-        college: "KMIT"
-    });
+    const [assessments, setAssessments] = useState<Assessment[]>([]);
+    const [selectedAssessmentId, setSelectedAssessmentId] = useState<number | null>(null);
+    const [questions, setQuestions] = useState<ExamQuestion[]>([]);
+    const [loadingQ, setLoadingQ] = useState(false);
+
+    // Upload state
+    const [file, setFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadResult, setUploadResult] = useState<{ success: boolean; message: string } | null>(null);
+    const [dragOver, setDragOver] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Filter
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
-        setQuestions([
-            { id: 1, text: "What is the time complexity of binary search?", options: ["O(n)", "O(log n)", "O(n log n)", "O(1)"], correctAnswer: "B", difficulty: "Medium", college: "KMIT" },
-            { id: 2, text: "Which keyword is used to define a class in Java?", options: ["define", "struct", "class", "object"], correctAnswer: "C", difficulty: "Easy", college: "CBIT" },
-        ]);
+        fetch("/api/admin/assessments")
+            .then(r => r.json())
+            .then((data: Assessment[]) => {
+                setAssessments(Array.isArray(data) ? data : []);
+            })
+            .catch(() => {});
     }, []);
 
-    const handleAddQuestion = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        const id = questions.length + 1;
-        setQuestions([{ ...newQuestion, id }, ...questions]);
-        setNewQuestion({ text: "", options: ["", "", "", ""], correctAnswer: "A", difficulty: "Medium", college: selectedCollege === "ALL" ? "KMIT" : selectedCollege });
-        setIsAdding(false);
-        setLoading(false);
+    useEffect(() => {
+        if (!selectedAssessmentId) return;
+        setLoadingQ(true);
+        fetch(`/api/exam/${selectedAssessmentId}/questions`)
+            .then(r => r.json())
+            .then(data => setQuestions(Array.isArray(data) ? data : []))
+            .catch(() => setQuestions([]))
+            .finally(() => setLoadingQ(false));
+    }, [selectedAssessmentId]);
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault(); setDragOver(false);
+        const f = e.dataTransfer.files[0];
+        if (f) setFile(f);
     };
 
-    const filteredQuestions = selectedCollege === "ALL"
-        ? questions
-        : questions.filter(q => q.college === selectedCollege);
-
-    const difficultyBadge = (d: string) => {
-        if (d === "Easy") return "bg-emerald-50 text-emerald-600 border border-emerald-100";
-        if (d === "Medium") return "bg-amber-50 text-amber-600 border border-amber-100";
-        return "bg-rose-50 text-rose-600 border border-rose-100";
+    const handleUpload = async () => {
+        if (!file || !selectedAssessmentId) return;
+        setUploading(true); setUploadResult(null);
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+            const res = await fetch(`/api/admin/exam/${selectedAssessmentId}/upload`, {
+                method: "POST",
+                body: formData,
+            });
+            const data = await res.json();
+            setUploadResult(data);
+            if (data.success) {
+                setFile(null);
+                // Refresh question list
+                const q = await fetch(`/api/exam/${selectedAssessmentId}/questions`).then(r => r.json());
+                setQuestions(Array.isArray(q) ? q : []);
+            }
+        } catch (e: any) {
+            setUploadResult({ success: false, message: e.message });
+        } finally {
+            setUploading(false);
+        }
     };
+
+    const filtered = questions.filter(q =>
+        !search || q.text.toLowerCase().includes(search.toLowerCase()) || q.section.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const diffColor = (d: string) =>
+        d === "Easy" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" :
+        d === "Hard" ? "bg-rose-50 text-rose-600 border border-rose-100" :
+        "bg-amber-50 text-amber-600 border border-amber-100";
 
     return (
         <div className="space-y-8">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Question Bank</h1>
-                    <p className="text-sm text-gray-500 mt-0.5">Manage and organize questions for each college level.</p>
-                </div>
-                <button
-                    onClick={() => setIsAdding(true)}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-sm shadow-indigo-200"
-                >
-                    <Plus className="w-5 h-5" />
-                    Add Question
-                </button>
+            <div>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Question Bank</h1>
+                <p className="text-sm text-gray-500 mt-0.5">Upload question papers (Excel/PDF) per assessment. Students see only the uploaded questions.</p>
             </div>
 
-            {/* Filters */}
-            <div className="bg-white border border-gray-100 shadow-sm p-4 rounded-2xl flex flex-wrap gap-4 items-center">
-                <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200 min-w-[200px]">
-                    <Filter className="w-4 h-4 text-gray-400" />
-                    <select
-                        value={selectedCollege}
-                        onChange={(e) => setSelectedCollege(e.target.value as CollegeLevel)}
-                        className="bg-transparent text-sm text-gray-700 focus:outline-none w-full cursor-pointer"
-                    >
-                        {colleges.map(c => <option key={c} value={c}>{c === "ALL" ? "All Colleges" : c}</option>)}
-                    </select>
+            {/* Upload Section */}
+            <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+                    <div className="bg-indigo-100 p-2 rounded-xl">
+                        <UploadCloud className="w-5 h-5 text-indigo-600" />
+                    </div>
+                    <div>
+                        <h2 className="font-bold text-gray-900 text-sm">Upload Question Paper</h2>
+                        <p className="text-xs text-gray-400">Excel (.xlsx) or PDF. Existing questions will be replaced.</p>
+                    </div>
                 </div>
-                <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search questions..."
-                        className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                    />
+
+                <div className="p-6 space-y-5">
+                    {/* Assessment Selector */}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">1. Select Assessment</label>
+                        <div className="relative">
+                            <select
+                                value={selectedAssessmentId ?? ""}
+                                onChange={e => { setSelectedAssessmentId(Number(e.target.value)); setUploadResult(null); }}
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none"
+                            >
+                                <option value="">-- Choose an assessment --</option>
+                                {assessments.map(a => (
+                                    <option key={a.id} value={a.id}>{a.title} ({a.type})</option>
+                                ))}
+                            </select>
+                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        </div>
+                    </div>
+
+                    {/* File Drop Zone */}
+                    <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">2. Choose File</label>
+                        <div
+                            onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                            onDragLeave={() => setDragOver(false)}
+                            onDrop={handleDrop}
+                            onClick={() => fileInputRef.current?.click()}
+                            className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all
+                                ${dragOver ? "border-indigo-400 bg-indigo-50/50" : file ? "border-emerald-300 bg-emerald-50/30" : "border-gray-200 bg-gray-50 hover:border-indigo-300 hover:bg-indigo-50/30"}`}
+                        >
+                            {file ? (
+                                <div className="flex items-center justify-center gap-3">
+                                    {file.name.endsWith(".pdf") ? <FileText className="w-8 h-8 text-rose-500" /> : <FileSpreadsheet className="w-8 h-8 text-emerald-600" />}
+                                    <div className="text-left">
+                                        <p className="text-sm font-bold text-gray-900">{file.name}</p>
+                                        <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
+                                    </div>
+                                    <button
+                                        onClick={e => { e.stopPropagation(); setFile(null); }}
+                                        className="ml-2 p-1.5 rounded-lg hover:bg-gray-200 text-gray-400 transition-all"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <UploadCloud className="w-10 h-10 text-gray-300 mx-auto" />
+                                    <p className="text-sm font-medium text-gray-500">Drag & drop or <span className="text-indigo-600 font-bold">click to browse</span></p>
+                                    <p className="text-xs text-gray-400">.xlsx · .xls · .pdf</p>
+                                </div>
+                            )}
+                        </div>
+                        <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.pdf" className="hidden" onChange={e => setFile(e.target.files?.[0] ?? null)} />
+                    </div>
+
+                    {/* Excel Format Hint */}
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                        <p className="text-xs font-bold text-blue-700 mb-2">📋 Excel Format (Row 1 = Header)</p>
+                        <div className="overflow-x-auto">
+                            <table className="text-[10px] text-blue-700 w-full">
+                                <thead><tr className="font-black border-b border-blue-200">
+                                    <td className="pb-1 pr-2">Section</td><td className="pb-1 pr-2">Question</td><td className="pb-1 pr-2">Option A</td><td className="pb-1 pr-2">Option B</td><td className="pb-1 pr-2">Option C</td><td className="pb-1 pr-2">Option D</td><td className="pb-1 pr-2">Correct</td><td className="pb-1">Difficulty</td>
+                                </tr></thead>
+                                <tbody><tr className="opacity-75">
+                                    <td className="pr-2">General</td><td className="pr-2">What is...?</td><td className="pr-2">ans A</td><td className="pr-2">ans B</td><td className="pr-2">ans C</td><td className="pr-2">ans D</td><td className="pr-2">A</td><td>Medium</td>
+                                </tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Upload Button */}
+                    <button
+                        onClick={handleUpload}
+                        disabled={!file || !selectedAssessmentId || uploading}
+                        className="w-full py-3 bg-indigo-600 text-white rounded-xl font-black hover:bg-indigo-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-sm"
+                    >
+                        {uploading ? (
+                            <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Uploading...</>
+                        ) : (
+                            <><UploadCloud className="w-4 h-4" /> Upload & Parse Question Paper</>
+                        )}
+                    </button>
+
+                    {/* Upload Result */}
+                    {uploadResult && (
+                        <div className={`flex items-center gap-3 p-4 rounded-xl border ${uploadResult.success ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-rose-50 border-rose-200 text-rose-700"}`}>
+                            {uploadResult.success ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 flex-shrink-0" />}
+                            <p className="text-sm font-medium">{uploadResult.message}</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Questions Table */}
-            <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider border-b border-gray-100">
-                            <th className="px-6 py-4">Question</th>
-                            <th className="px-6 py-4">College</th>
-                            <th className="px-6 py-4">Difficulty</th>
-                            <th className="px-6 py-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {filteredQuestions.map((q) => (
-                            <tr key={q.id} className="hover:bg-gray-50 transition-colors group">
-                                <td className="px-6 py-5">
-                                    <p className="text-sm font-medium text-gray-900 line-clamp-2">{q.text}</p>
-                                    <div className="flex gap-2 mt-2">
-                                        {q.options.map((opt, i) => (
-                                            <span
-                                                key={i}
-                                                className={`text-[10px] px-2 py-0.5 rounded font-semibold ${String.fromCharCode(65 + i) === q.correctAnswer
-                                                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                                                    : 'bg-gray-100 text-gray-500'
-                                                    }`}
-                                            >
-                                                {String.fromCharCode(65 + i)}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-5">
-                                    <span className="text-xs font-bold bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg">
-                                        {q.college}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-5">
-                                    <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${difficultyBadge(q.difficulty)}`}>
-                                        {q.difficulty}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-5 text-right">
-                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-700 transition-all">
-                                            <Edit2 className="w-4 h-4" />
-                                        </button>
-                                        <button className="p-2 hover:bg-rose-50 rounded-lg text-gray-400 hover:text-rose-500 transition-all">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Add Question Modal */}
-            {isAdding && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsAdding(false)} />
-                    <div className="relative bg-white border border-gray-100 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                        {/* Modal Header */}
-                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-gray-900">Create New Question</h2>
-                            <button
-                                onClick={() => setIsAdding(false)}
-                                className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-all"
-                            >
-                                <XCircle className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleAddQuestion} className="p-6 space-y-6 overflow-y-auto">
-                            {/* Question Text */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Question Text</label>
-                                <textarea
-                                    required
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 min-h-[100px] transition-all placeholder-gray-400"
-                                    placeholder="Enter the question here..."
-                                    value={newQuestion.text}
-                                    onChange={(e) => setNewQuestion({ ...newQuestion, text: e.target.value })}
+            {selectedAssessmentId && (
+                <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                    <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-4">
+                        <h2 className="font-bold text-gray-900 text-sm">
+                            Question Preview
+                            {!loadingQ && <span className="text-indigo-500 ml-2">({questions.length} questions)</span>}
+                        </h2>
+                        <div className="flex items-center gap-3">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                                <input
+                                    value={search}
+                                    onChange={e => setSearch(e.target.value)}
+                                    type="text"
+                                    placeholder="Search questions..."
+                                    className="pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 w-44 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                 />
                             </div>
-
-                            <div className="grid sm:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">College Level</label>
-                                    <select
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                                        value={newQuestion.college}
-                                        onChange={(e) => setNewQuestion({ ...newQuestion, college: e.target.value as CollegeLevel })}
-                                    >
-                                        {colleges.filter(c => c !== "ALL").map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Difficulty</label>
-                                    <select
-                                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                                        value={newQuestion.difficulty}
-                                        onChange={(e) => setNewQuestion({ ...newQuestion, difficulty: e.target.value as any })}
-                                    >
-                                        {difficulties.map(d => <option key={d} value={d}>{d}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Options */}
-                            <div className="space-y-4">
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Options & Correct Answer</label>
-                                {newQuestion.options.map((opt, i) => (
-                                    <div key={i} className="flex items-center gap-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => setNewQuestion({ ...newQuestion, correctAnswer: String.fromCharCode(65 + i) })}
-                                            className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold transition-all border text-sm
-                                                ${newQuestion.correctAnswer === String.fromCharCode(65 + i)
-                                                    ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
-                                                    : "bg-gray-50 border-gray-200 text-gray-500 hover:border-indigo-300 hover:text-indigo-500"
-                                                }`}
-                                        >
-                                            {String.fromCharCode(65 + i)}
-                                        </button>
-                                        <input
-                                            required
-                                            type="text"
-                                            placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                                            className={`flex-1 bg-gray-50 border rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none transition-all
-                                                ${newQuestion.correctAnswer === String.fromCharCode(65 + i)
-                                                    ? "border-indigo-300 ring-1 ring-indigo-200"
-                                                    : "border-gray-200 hover:border-gray-300"
-                                                }`}
-                                            value={opt}
-                                            onChange={(e) => {
-                                                const next = [...newQuestion.options];
-                                                next[i] = e.target.value;
-                                                setNewQuestion({ ...newQuestion, options: next });
-                                            }}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Footer */}
-                            <div className="pt-4 flex gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsAdding(false)}
-                                    className="flex-1 py-3 px-6 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-xl font-bold transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="flex-1 py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-sm flex items-center justify-center gap-2"
-                                >
-                                    {loading
-                                        ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        : <UploadCloud className="w-5 h-5" />
-                                    }
-                                    Create Question
-                                </button>
-                            </div>
-                        </form>
+                            <button onClick={() => {
+                                setLoadingQ(true);
+                                fetch(`/api/exam/${selectedAssessmentId}/questions`).then(r => r.json()).then(data => setQuestions(Array.isArray(data) ? data : [])).finally(() => setLoadingQ(false));
+                            }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-all">
+                                <RefreshCw className={`w-4 h-4 ${loadingQ ? "animate-spin" : ""}`} />
+                            </button>
+                        </div>
                     </div>
+
+                    {loadingQ ? (
+                        <div className="p-12 flex items-center justify-center">
+                            <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                        </div>
+                    ) : filtered.length === 0 ? (
+                        <div className="p-12 text-center">
+                            <UploadCloud className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                            <p className="text-sm text-gray-400 font-medium">No questions yet. Upload a file to get started.</p>
+                        </div>
+                    ) : (
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-wider border-b border-gray-100">
+                                    <th className="px-6 py-3">#</th>
+                                    <th className="px-6 py-3">Section</th>
+                                    <th className="px-6 py-3">Question</th>
+                                    <th className="px-6 py-3">Difficulty</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {filtered.map((q, i) => (
+                                    <tr key={q.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4 text-xs font-black text-gray-300">{i + 1}</td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-[10px] font-bold bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-lg">{q.section}</span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <p className="text-sm font-medium text-gray-900 line-clamp-2">{q.text}</p>
+                                            <div className="flex gap-1.5 mt-1.5">
+                                                {[q.optionA, q.optionB, q.optionC, q.optionD].map((opt, oi) => (
+                                                    <span key={oi} className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded font-medium">
+                                                        {String.fromCharCode(65 + oi)}: {opt}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`text-[10px] font-black px-2 py-1 rounded-md ${diffColor(q.difficulty)}`}>{q.difficulty}</span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
             )}
         </div>

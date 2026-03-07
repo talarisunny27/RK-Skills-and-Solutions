@@ -13,18 +13,18 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
-        const res = await fetch("http://localhost:8080/api/v1/users/admin/all", {
+        const res = await fetch("http://localhost:8080/api/v1/dashboard/admin", {
             cache: "no-store",
         });
 
         if (!res.ok) {
-            throw new Error(`Failed to fetch students: ${res.status}`);
+            throw new Error(`Failed to fetch admin stats: ${res.status}`);
         }
 
         const data = await res.json();
         return NextResponse.json(data);
     } catch (error: any) {
-        console.error("Error in /api/admin/students:", error);
-        return NextResponse.json({ error: "Failed to fetch students data" }, { status: 500 });
+        console.error("Error in /api/admin/stats:", error);
+        return NextResponse.json({ error: "Failed to fetch admin stats" }, { status: 500 });
     }
 }

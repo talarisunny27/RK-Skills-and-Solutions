@@ -18,14 +18,20 @@ export default function AdminStudents() {
     const [students, setStudents] = useState<StudentStat[]>([]);
     const [selectedCollege, setSelectedCollege] = useState<CollegeLevel>("ALL");
     const [searchQuery, setSearchQuery] = useState("");
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setStudents([
-            { userId: "1", fullName: "Rahul Kumar", email: "rahul@kmit.in", college: "KMIT", testsTaken: 12, totalScore: 840, avgAccuracy: "88%", rank: "#4" },
-            { userId: "2", fullName: "Sneha Reddy", email: "sneha@cbit.ac.in", college: "CBIT", testsTaken: 10, totalScore: 720, avgAccuracy: "82%", rank: "#12" },
-            { userId: "3", fullName: "Vijay Pratap", email: "vijay@mgit.edu.in", college: "MGIT", testsTaken: 8, totalScore: 560, avgAccuracy: "75%", rank: "#28" },
-            { userId: "4", fullName: "Ananya Rao", email: "ananya@kmit.in", college: "KMIT", testsTaken: 15, totalScore: 1120, avgAccuracy: "94%", rank: "#1" },
-        ]);
+        fetch("/api/admin/students")
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setStudents(data);
+                } else {
+                    console.error("Failed to fetch admin students", data);
+                }
+            })
+            .catch(err => console.error("Error fetching admin students:", err))
+            .finally(() => setLoading(false));
     }, []);
 
     const filteredStudents = students.filter(s => {
@@ -92,7 +98,16 @@ export default function AdminStudents() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filteredStudents.length === 0 ? (
+                            {loading ? (
+                                <tr>
+                                    <td colSpan={7} className="px-6 py-20 text-center">
+                                        <div className="flex flex-col items-center justify-center gap-3">
+                                            <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                                            <p className="text-sm font-medium text-gray-500">Loading student data...</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : filteredStudents.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="px-6 py-20 text-center">
                                         <div className="flex flex-col items-center gap-2 text-gray-400">

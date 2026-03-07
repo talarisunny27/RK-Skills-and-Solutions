@@ -12,45 +12,75 @@ import {
     CheckCircle2
 } from "lucide-react";
 
+interface AttemptResultDTO {
+    id: number;
+    title: string;
+    date: string;
+    submittedAt: string;
+    attempt: number;
+    accuracy: string;
+    score: number;
+    rank: number;
+}
+
+interface AdminStats {
+    totalStudents: number;
+    questionsBank: number;
+    activeTests: number;
+    avgAccuracy: string;
+    recentActivity: AttemptResultDTO[];
+}
+
 export default function AdminOverview() {
-    // In a real app, these would be fetched from /api/admin/stats
+    const [statsData, setStatsData] = useState<AdminStats | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch("/api/admin/stats")
+            .then(res => res.json())
+            .then(data => {
+                if (data.totalStudents !== undefined) {
+                    setStatsData(data);
+                } else {
+                    console.error("Failed to load admin stats", data);
+                }
+            })
+            .catch(err => console.error("Error fetching stats:", err))
+            .finally(() => setLoading(false));
+    }, []);
+
     const stats = [
         {
             label: "Total Students",
-            value: "1,284",
+            value: statsData?.totalStudents ?? "-",
             icon: Users,
             bg: "bg-gradient-to-br from-blue-400 to-indigo-500",
-            trend: "+12%"
+            trend: "Live"
         },
         {
             label: "Questions Bank",
-            value: "850",
+            value: statsData?.questionsBank ?? "-",
             icon: ClipboardList,
             bg: "bg-gradient-to-br from-emerald-400 to-teal-600",
-            trend: "+5%"
+            trend: "Live"
         },
         {
             label: "Active Tests",
-            value: "12",
+            value: statsData?.activeTests ?? "-",
             icon: FileText,
             bg: "bg-gradient-to-br from-amber-400 to-yellow-500",
-            trend: "0%"
+            trend: "Live"
         },
         {
             label: "Avg Accuracy",
-            value: "72.4%",
+            value: statsData?.avgAccuracy ?? "-",
             icon: TrendingUp,
             bg: "bg-gradient-to-br from-rose-400 to-rose-600",
-            trend: "+2.1%"
+            trend: "Global"
         },
     ];
 
-    const recentActivity = [
-        { id: 1, user: "John Doe", action: "Completed Day 1 CRT", time: "2 mins ago", college: "KMIT", score: "85%" },
-        { id: 2, user: "Sarah Smith", action: "Registered", time: "15 mins ago", college: "CBIT", score: "-" },
-        { id: 3, user: "Mike Johnson", action: "Submitted Attempt #2", time: "1 hour ago", college: "MGIT", score: "92%" },
-        { id: 4, user: "Alice Wong", action: "Failed Day 2 Aptitude", time: "3 hours ago", college: "KMIT", score: "40%" },
-    ];
+    const recentActivity = statsData?.recentActivity ?? [];
 
     return (
         <div className="space-y-8">
@@ -103,21 +133,30 @@ export default function AdminOverview() {
                         <button className="text-xs text-indigo-600 hover:text-indigo-700 font-bold uppercase tracking-wider">View All</button>
                     </div>
                     <div className="divide-y divide-gray-50 flex-1">
-                        {recentActivity.map((item) => (
+                        {loading ? (
+                            <div className="px-6 py-10 text-center flex flex-col items-center gap-3">
+                                <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                                <p className="text-sm font-medium text-gray-500">Loading activity...</p>
+                            </div>
+                        ) : recentActivity.length === 0 ? (
+                            <div className="px-6 py-10 text-center text-gray-500 text-sm font-medium">
+                                No recent activity found.
+                            </div>
+                        ) : recentActivity.map((item) => (
                             <div key={item.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
                                 <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100 flex-shrink-0">
-                                        <span className="text-xs font-bold text-indigo-600">{item.user.charAt(0)}</span>
+                                        <span className="text-xs font-bold text-indigo-600">{item.title.charAt(0)}</span>
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-sm font-bold text-gray-900 truncate">{item.user}</p>
-                                        <p className="text-xs text-gray-500 truncate">{item.action} • {item.college}</p>
+                                        <p className="text-sm font-bold text-gray-900 truncate">Test: {item.title}</p>
+                                        <p className="text-[11px] text-gray-500 truncate">Submitted on {new Date(item.submittedAt).toLocaleString()}</p>
                                     </div>
                                 </div>
                                 <div className="text-right flex-shrink-0">
-                                    <p className="text-[10px] text-gray-400 uppercase font-bold">{item.time}</p>
-                                    <p className={`text-sm font-black ${item.score === '-' ? 'text-gray-300' : 'text-emerald-500'}`}>
-                                        {item.score}
+                                    <p className="text-[10px] text-gray-400 uppercase font-bold text-emerald-600">{item.accuracy} Accuracy</p>
+                                    <p className="text-sm font-black text-indigo-600">
+                                        {item.score} <span className="text-xs text-gray-400 font-medium">pts</span>
                                     </p>
                                 </div>
                             </div>

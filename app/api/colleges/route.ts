@@ -1,18 +1,15 @@
 import { NextResponse } from "next/server";
-import { Assessment } from "@/app/lib/types";
 import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
     try {
-        const { userId, sessionClaims } = await auth();
+        const { userId } = await auth();
         
         if (!userId) {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const college = (sessionClaims?.metadata as any)?.college || (sessionClaims as any)?.publicMetadata?.college || "ALL";
-
-        const response = await fetch(`http://localhost:8080/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`, {
+        const response = await fetch(`http://localhost:8080/api/v1/assessments/colleges`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,8 +21,8 @@ export async function GET() {
             throw new Error(`Backend returned ${response.status}`);
         }
 
-        const assessments: Assessment[] = await response.json();
-        return NextResponse.json(assessments);
+        const colleges: string[] = await response.json();
+        return NextResponse.json(colleges);
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
