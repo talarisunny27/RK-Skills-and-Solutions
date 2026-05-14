@@ -14,6 +14,7 @@ export interface Assessment {
     id: number;
     title: string;
     type: "ASSESSMENT" | "PRACTICE";
+    module?: string;
     date: string;
     duration: number;
     schedule: "Anytime" | string;

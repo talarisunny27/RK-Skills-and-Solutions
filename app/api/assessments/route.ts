@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { Assessment } from "@/app/lib/types";
 import { auth } from "@clerk/nextjs/server";
+<<<<<<< Updated upstream
 import { API_BASE_URL } from "@/app/lib/api";
+=======
+import { buildApiUrl } from "@/app/lib/api";
+>>>>>>> Stashed changes
 
 export async function GET() {
     try {
@@ -13,7 +17,11 @@ export async function GET() {
 
         const college = (sessionClaims?.metadata as any)?.college || (sessionClaims as any)?.publicMetadata?.college || "ALL";
 
+<<<<<<< Updated upstream
         const response = await fetch(`${API_BASE_URL}/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`, {
+=======
+        const response = await fetch(buildApiUrl(`/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`), {
+>>>>>>> Stashed changes
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

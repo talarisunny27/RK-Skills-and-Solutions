@@ -1394,7 +1394,19 @@ export default function Home() {
                   <span className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-orange-600">
                     ✉
                   </span>
-                  rkskillsandsolution@gmail.com
+                  rkskillsandsolutions@gmail.com
+                </a>
+
+                <a
+                  href="https://wa.me/918341391285"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-gray-700 hover:text-green-600 transition-colors"
+                >
+                  <span className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xl">
+                    💬
+                  </span>
+                 M.K. Radha Krishna  +91 8341391285
                 </a>
 
                 <a
@@ -1406,7 +1418,7 @@ export default function Home() {
                   <span className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xl">
                     💬
                   </span>
-                  +91 9550465533
+                  Talari Venkata Sunny +91 9550465533
                 </a>
               </div>
             </motion.div>

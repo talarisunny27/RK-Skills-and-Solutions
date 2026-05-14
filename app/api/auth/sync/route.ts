@@ -1,6 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+<<<<<<< Updated upstream
 import { API_BASE_URL } from "@/app/lib/api";
+=======
+import { buildApiUrl } from "@/app/lib/api";
+>>>>>>> Stashed changes
 
 export async function POST(req: NextRequest) {
     try {
@@ -10,7 +14,11 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { email, name, college } = body;
 
+<<<<<<< Updated upstream
         const backendResponse = await fetch(`${API_BASE_URL}/api/v1/users/sync`, {
+=======
+        const backendResponse = await fetch(buildApiUrl("/api/v1/users/sync"), {
+>>>>>>> Stashed changes
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: userId, email, name, college }),

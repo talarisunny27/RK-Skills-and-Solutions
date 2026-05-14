@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+<<<<<<< Updated upstream
 import { API_BASE_URL } from "@/app/lib/api";
+=======
+import { buildApiUrl } from "@/app/lib/api";
+>>>>>>> Stashed changes
 
 async function checkAdmin() {
     const { sessionClaims } = await auth();
@@ -17,7 +21,11 @@ async function checkAdmin() {
 export async function GET() {
     try {
         await checkAdmin();
+<<<<<<< Updated upstream
         const res = await fetch(`${API_BASE_URL}/api/v1/assessments/admin/all`, {
+=======
+        const res = await fetch(buildApiUrl("/api/v1/assessments/admin/all"), {
+>>>>>>> Stashed changes
             cache: "no-store",
         });
         if (!res.ok) throw new Error(`Backend returned ${res.status}`);
@@ -35,7 +43,11 @@ export async function POST(request: Request) {
     try {
         await checkAdmin();
         const body = await request.json();
+<<<<<<< Updated upstream
         const res = await fetch(`${API_BASE_URL}/api/v1/assessments/admin`, {
+=======
+        const res = await fetch(buildApiUrl("/api/v1/assessments/admin"), {
+>>>>>>> Stashed changes
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),

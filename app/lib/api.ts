@@ -2,6 +2,15 @@ import { auth } from "@clerk/nextjs/server";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+export function buildApiUrl(endpoint: string): string {
+    if (endpoint.startsWith("http")) {
+        return endpoint;
+    }
+
+    const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    return `${API_BASE_URL}${normalizedEndpoint}`;
+}
+
 /**
  * Server-side helper to call the Spring Boot API
  * Automatically adds the Clerk authentication token
@@ -19,9 +28,7 @@ export async function apiFetch<T>(
     }
     headers.set("Content-Type", "application/json");
 
-    const url = endpoint.startsWith("http")
-        ? endpoint
-        : `${API_BASE_URL}${endpoint}`;
+    const url = buildApiUrl(endpoint);
 
     const response = await fetch(url, {
         ...options,

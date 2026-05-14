@@ -1,6 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+<<<<<<< Updated upstream
 import { API_BASE_URL } from "@/app/lib/api";
+=======
+import { buildApiUrl } from "@/app/lib/api";
+>>>>>>> Stashed changes
 
 export async function POST(req: NextRequest) {
     try {
@@ -25,7 +29,11 @@ export async function POST(req: NextRequest) {
         if (user) {
             const email = user.emailAddresses[0]?.emailAddress ?? "";
             const name = user.fullName ?? user.firstName ?? "Unknown";
+<<<<<<< Updated upstream
             await fetch(`${API_BASE_URL}/api/v1/users/sync`, {
+=======
+            await fetch(buildApiUrl("/api/v1/users/sync"), {
+>>>>>>> Stashed changes
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: userId, email, name, college: collegeName }),

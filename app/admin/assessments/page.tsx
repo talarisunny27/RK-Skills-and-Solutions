@@ -14,6 +14,10 @@ import {
     Loader2
 } from "lucide-react";
 import { CollegeLevel, Assessment } from "@/app/lib/types";
+import {
+    getModuleOptions,
+    withResolvedModules,
+} from "@/app/lib/assessmentModules";
 
 const colleges: CollegeLevel[] = ["KMIT", "CBIT", "MGIT", "ALL"];
 const assessmentTypes = ["ASSESSMENT", "PRACTICE"];
@@ -21,15 +25,16 @@ const assessmentTypes = ["ASSESSMENT", "PRACTICE"];
 export default function AdminAssessments() {
     const [assessments, setAssessments] = useState<Assessment[]>([]);
     const [dynamicColleges, setDynamicColleges] = useState<string[]>([]);
+    const [moduleOptions, setModuleOptions] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [saving, setSaving] = useState(false);
     
-    // Form state
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formData, setFormData] = useState({
         title: "",
         type: "ASSESSMENT",
+        module: "English",
         date: new Date().toISOString().split("T")[0],
         duration: 60,
         schedule: "Anytime",
@@ -41,8 +46,10 @@ export default function AdminAssessments() {
         try {
             const res = await fetch("/api/admin/assessments");
             if (res.ok) {
-                const data = await res.json();
-                setAssessments(data);
+                const data: Assessment[] = await res.json();
+                const resolved = withResolvedModules(data);
+                setAssessments(resolved);
+                setModuleOptions(getModuleOptions(data));
             }
         } catch (error) {
             console.error("Failed to fetch assessments:", error);
@@ -67,6 +74,7 @@ export default function AdminAssessments() {
         setFormData({
             title: "",
             type: "ASSESSMENT",
+            module: moduleOptions[0] || "English",
             date: new Date().toISOString().split("T")[0],
             duration: 60,
             schedule: "Anytime",
@@ -81,6 +89,7 @@ export default function AdminAssessments() {
         setFormData({
             title: a.title,
             type: a.type,
+            module: a.module || "Other",
             date: a.date,
             duration: a.duration,
             schedule: a.schedule,
@@ -135,7 +144,6 @@ export default function AdminAssessments() {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Assessments &amp; Tests</h1>
@@ -150,20 +158,17 @@ export default function AdminAssessments() {
                 </button>
             </div>
 
-            {/* Loading State */}
             {loading ? (
                 <div className="flex items-center justify-center h-64">
                     <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
                 </div>
             ) : (
-                /* Assessment Grid */
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {assessments.map((a) => (
                         <div
                             key={a.id}
                             className="bg-white border border-gray-100 rounded-2xl p-6 hover:border-indigo-200 hover:shadow-md transition-all group relative overflow-hidden shadow-sm flex flex-col"
                         >
-                            {/* Accent bar */}
                             <div className="absolute top-0 left-0 w-1 h-full bg-indigo-600 rounded-l-2xl" />
 
                             <div className="flex items-start justify-between">
@@ -172,7 +177,7 @@ export default function AdminAssessments() {
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                     <div className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border
-                                        ${a.type === 'PRACTICE' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
+                                        ${a.type === "PRACTICE" ? "bg-amber-50 text-amber-600 border-amber-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"}`}>
                                         <CheckCircle2 className="w-3 h-3" />
                                         {a.type}
                                     </div>
@@ -188,6 +193,10 @@ export default function AdminAssessments() {
                             </div>
 
                             <div className="mt-5 pt-4 border-t border-gray-50 flex flex-col gap-2.5">
+                                <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                                    <Layers className="w-3.5 h-3.5 text-violet-400" />
+                                    Module: <span className="text-violet-600 font-bold">{a.module || "Other"}</span>
+                                </div>
                                 <div className="flex items-center justify-between text-xs font-medium text-gray-500">
                                     <div className="flex items-center gap-1.5">
                                         <Calendar className="w-3.5 h-3.5 text-gray-400" />
@@ -226,7 +235,6 @@ export default function AdminAssessments() {
                         </div>
                     ))}
 
-                    {/* Create New Placeholder */}
                     <button
                         onClick={handleOpenCreate}
                         className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center p-8 gap-4 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all group min-h-[300px]"
@@ -239,13 +247,11 @@ export default function AdminAssessments() {
                 </div>
             )}
 
-            {/* Create/Edit Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6">
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !saving && setIsModalOpen(false)} />
                     
                     <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                        {/* Header */}
                         <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50">
                             <h2 className="text-xl font-bold text-gray-900">
                                 {editingId ? "Edit Assessment" : "Create New Assessment"}
@@ -258,7 +264,6 @@ export default function AdminAssessments() {
                             </button>
                         </div>
 
-                        {/* Form Body */}
                         <div className="p-6 overflow-y-auto">
                             <form id="assessment-form" onSubmit={handleSubmit} className="space-y-5">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -283,6 +288,21 @@ export default function AdminAssessments() {
                                         >
                                             {assessmentTypes.map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-bold text-gray-700">Module</label>
+                                        <input
+                                            required
+                                            list="module-options"
+                                            value={formData.module}
+                                            onChange={e => setFormData({ ...formData, module: e.target.value })}
+                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white placeholder:text-gray-300"
+                                            placeholder="English, Aptitude, Mathematics..."
+                                        />
+                                        <datalist id="module-options">
+                                            {moduleOptions.map(module => <option key={module} value={module}>{module}</option>)}
+                                        </datalist>
                                     </div>
 
                                     <div className="space-y-1.5">
@@ -352,7 +372,6 @@ export default function AdminAssessments() {
                             </form>
                         </div>
 
-                        {/* Footer */}
                         <div className="p-6 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3 rounded-b-3xl">
                             <button
                                 type="button"

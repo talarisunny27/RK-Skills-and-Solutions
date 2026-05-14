@@ -1,6 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+<<<<<<< Updated upstream
 import { API_BASE_URL } from "@/app/lib/api";
+=======
+import { buildApiUrl } from "@/app/lib/api";
+>>>>>>> Stashed changes
 
 // Admin uploads a question paper (Excel or PDF) for a specific assessment.
 // Streams the file directly to the Java backend.
@@ -15,7 +19,11 @@ export async function POST(
 
         const formData = await req.formData();
         const backendResponse = await fetch(
+<<<<<<< Updated upstream
             `${API_BASE_URL}/api/v1/exam/${assessmentId}/upload`,
+=======
+            buildApiUrl(`/api/v1/exam/${assessmentId}/upload`),
+>>>>>>> Stashed changes
             {
                 method: "POST",
                 body: formData, // forward the multipart file as-is

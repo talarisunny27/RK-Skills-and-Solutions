@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { DashboardStats } from "@/app/lib/types";
 import { auth, currentUser } from "@clerk/nextjs/server";
+<<<<<<< Updated upstream
 import { API_BASE_URL } from "@/app/lib/api";
+=======
+import { buildApiUrl } from "@/app/lib/api";
+>>>>>>> Stashed changes
 
 export async function GET() {
     try {
@@ -20,7 +24,11 @@ export async function GET() {
 
                 const college = (user.publicMetadata?.college as string) || "TKR College";
 
+<<<<<<< Updated upstream
                 await fetch(`${API_BASE_URL}/api/v1/users/sync`, {
+=======
+                await fetch(buildApiUrl("/api/v1/users/sync"), {
+>>>>>>> Stashed changes
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id: userId, email, name, college }),
@@ -32,7 +40,11 @@ export async function GET() {
         }
 
         const response = await fetch(
+<<<<<<< Updated upstream
             `${API_BASE_URL}/api/v1/dashboard/${userId}`,
+=======
+            buildApiUrl(`/api/v1/dashboard/${userId}`),
+>>>>>>> Stashed changes
             {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },

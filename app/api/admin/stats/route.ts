@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+<<<<<<< Updated upstream
 import { API_BASE_URL } from "@/app/lib/api";
+=======
+import { buildApiUrl } from "@/app/lib/api";
+>>>>>>> Stashed changes
 
 export async function GET() {
     try {
@@ -14,7 +18,11 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
+<<<<<<< Updated upstream
         const res = await fetch(`${API_BASE_URL}/api/v1/dashboard/admin`, {
+=======
+        const res = await fetch(buildApiUrl("/api/v1/dashboard/admin"), {
+>>>>>>> Stashed changes
             cache: "no-store",
         });
 
