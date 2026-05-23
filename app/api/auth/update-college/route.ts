@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "../../lib/server-api";
 
 export async function POST(req: NextRequest) {
     try {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
         if (user) {
             const email = user.emailAddresses[0]?.emailAddress ?? "";
             const name = user.fullName ?? user.firstName ?? "Unknown";
-            await fetch("http://localhost:8080/api/v1/users/sync", {
+            await fetch(backendUrl(`/api/v1/users/sync`), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: userId, email, name, college: collegeName }),
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error("[update-college] Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        const message = getBackendErrorMessage(error, error?.message || "Internal Server Error");
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

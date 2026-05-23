@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "../../../lib/server-api";
 
 export async function POST(
     req: NextRequest,
@@ -12,18 +13,16 @@ export async function POST(
 
         const body = await req.json();
 
-        const response = await fetch(
-            `http://localhost:8080/api/v1/exam/${assessmentId}/submit`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...body, userId }),
-            }
-        );
+        const response = await fetch(backendUrl(`/api/v1/exam/${assessmentId}/submit`), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...body, userId }),
+        });
 
         if (!response.ok) throw new Error(`Backend returned ${response.status}`);
         return NextResponse.json(await response.json());
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        const message = getBackendErrorMessage(error, error?.message || "Internal Server Error");
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

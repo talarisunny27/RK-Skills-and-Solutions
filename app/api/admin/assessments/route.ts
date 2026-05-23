@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "../../lib/server-api";
 
 async function checkAdmin() {
     const { sessionClaims } = await auth();
@@ -16,7 +17,7 @@ async function checkAdmin() {
 export async function GET() {
     try {
         await checkAdmin();
-        const res = await fetch("http://localhost:8080/api/v1/assessments/admin/all", {
+        const res = await fetch(backendUrl(`/api/v1/assessments/admin/all`), {
             cache: "no-store",
         });
         if (!res.ok) throw new Error(`Backend returned ${res.status}`);
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
     try {
         await checkAdmin();
         const body = await request.json();
-        const res = await fetch("http://localhost:8080/api/v1/assessments/admin", {
+        const res = await fetch(backendUrl(`/api/v1/assessments/admin`), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
@@ -43,9 +44,7 @@ export async function POST(request: Request) {
         const data = await res.json();
         return NextResponse.json(data);
     } catch (error: any) {
-        return NextResponse.json(
-            { error: error.message },
-            { status: error.message.includes("Unauthorized") ? 403 : 500 }
-        );
+        const message = getBackendErrorMessage(error, error?.message || "Internal Server Error");
+        return NextResponse.json({ error: message }, { status: message.includes("Unauthorized") ? 403 : 500 });
     }
 }

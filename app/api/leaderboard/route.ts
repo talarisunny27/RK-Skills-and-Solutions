@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "../lib/server-api";
 
 export async function GET() {
     try {
         const { userId } = await auth();
         if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
-        const response = await fetch("http://localhost:8080/api/v1/leaderboard", {
+        const response = await fetch(backendUrl(`/api/v1/leaderboard`), {
             cache: "no-store",
         });
 
@@ -18,6 +19,7 @@ export async function GET() {
         return NextResponse.json(data);
     } catch (error: any) {
         console.error("Leaderboard proxy error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        const message = getBackendErrorMessage(error, error?.message || "Internal Server Error");
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

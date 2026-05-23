@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "../../lib/server-api";
 
 export async function GET(
     _req: Request,
@@ -13,13 +14,14 @@ export async function GET(
         const college = (sessionClaims?.metadata as any)?.college || (sessionClaims as any)?.publicMetadata?.college || "ALL";
 
         const response = await fetch(
-            `http://localhost:8080/api/v1/exam/${assessmentId}/questions?college=${encodeURIComponent(college)}`,
+            backendUrl(`/api/v1/exam/${assessmentId}/questions?college=${encodeURIComponent(college)}`),
             { cache: "no-store" }
         );
 
         if (!response.ok) throw new Error(`Backend returned ${response.status}`);
         return NextResponse.json(await response.json());
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        const message = getBackendErrorMessage(error, error?.message || "Internal Server Error");
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

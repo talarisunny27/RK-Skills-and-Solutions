@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ResultsData } from "@/app/lib/types";
 import { auth } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "../../lib/server-api";
 
 export async function GET() {
     try {
@@ -10,7 +11,7 @@ export async function GET() {
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const response = await fetch(`http://localhost:8080/api/v1/results/${userId}`, {
+        const response = await fetch(backendUrl(`/api/v1/results/${userId}`), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -25,6 +26,7 @@ export async function GET() {
         const results: ResultsData = await response.json();
         return NextResponse.json(results);
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        const message = getBackendErrorMessage(error, error?.message || "Internal Server Error");
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

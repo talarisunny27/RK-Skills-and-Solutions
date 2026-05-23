@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "../../../../lib/server-api";
 
 async function checkAdmin() {
     const { sessionClaims } = await auth();
@@ -22,7 +23,7 @@ export async function PUT(
         const id = (await params).id;
         const body = await request.json();
 
-        const res = await fetch(`http://localhost:8080/api/v1/assessments/admin/${id}`, {
+        const res = await fetch(backendUrl(`/api/v1/assessments/admin/${id}`), {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
@@ -31,10 +32,8 @@ export async function PUT(
         if (!res.ok) throw new Error(`Backend PUT failed: ${res.status}`);
         return NextResponse.json({ success: true });
     } catch (error: any) {
-        return NextResponse.json(
-            { error: error.message },
-            { status: error.message.includes("Unauthorized") ? 403 : 500 }
-        );
+        const message = getBackendErrorMessage(error, error?.message || "Internal Server Error");
+        return NextResponse.json({ error: message }, { status: message.includes("Unauthorized") ? 403 : 500 });
     }
 }
 
@@ -46,16 +45,13 @@ export async function DELETE(
         await checkAdmin();
         const id = (await params).id;
 
-        const res = await fetch(`http://localhost:8080/api/v1/assessments/admin/${id}`, {
+        const res = await fetch(backendUrl(`/api/v1/assessments/admin/${id}`), {
             method: "DELETE",
         });
-
         if (!res.ok) throw new Error(`Backend DELETE failed: ${res.status}`);
         return NextResponse.json({ success: true });
     } catch (error: any) {
-        return NextResponse.json(
-            { error: error.message },
-            { status: error.message.includes("Unauthorized") ? 403 : 500 }
-        );
+        const message = getBackendErrorMessage(error, error?.message || "Internal Server Error");
+        return NextResponse.json({ error: message }, { status: message.includes("Unauthorized") ? 403 : 500 });
     }
 }

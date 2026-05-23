@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "../../lib/server-api";
 
 export async function GET() {
     try {
@@ -13,7 +14,7 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
         }
 
-        const res = await fetch("http://localhost:8080/api/v1/users/admin/all", {
+        const res = await fetch(backendUrl(`/api/v1/users/admin/all`), {
             cache: "no-store",
         });
 
@@ -25,6 +26,7 @@ export async function GET() {
         return NextResponse.json(data);
     } catch (error: any) {
         console.error("Error in /api/admin/students:", error);
-        return NextResponse.json({ error: "Failed to fetch students data" }, { status: 500 });
+        const message = getBackendErrorMessage(error, "Failed to fetch students data");
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
