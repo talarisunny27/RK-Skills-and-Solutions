@@ -14,9 +14,17 @@ import {
     Loader2
 } from "lucide-react";
 import { CollegeLevel, Assessment } from "@/app/lib/types";
+import {
+    ASSESSMENT_MODULES,
+    AssessmentModule,
+    DEFAULT_ASSESSMENT_MODULE,
+    getSubmodulesForModule,
+    normalizeAssessmentModule,
+} from "@/app/lib/assessment-modules";
 
 const colleges: CollegeLevel[] = ["KMIT", "CBIT", "MGIT", "ALL"];
 const assessmentTypes = ["ASSESSMENT", "PRACTICE"];
+const defaultSubmodule = getSubmodulesForModule(DEFAULT_ASSESSMENT_MODULE)[0];
 
 export default function AdminAssessments() {
     const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -35,6 +43,8 @@ export default function AdminAssessments() {
         schedule: "Anytime",
         description: "",
         college: "ALL" as CollegeLevel,
+        module: DEFAULT_ASSESSMENT_MODULE,
+        submodule: defaultSubmodule,
     });
 
     const fetchAssessments = async () => {
@@ -72,11 +82,14 @@ export default function AdminAssessments() {
             schedule: "Anytime",
             description: "",
             college: "ALL",
+            module: DEFAULT_ASSESSMENT_MODULE,
+            submodule: defaultSubmodule,
         });
         setIsModalOpen(true);
     };
 
     const handleOpenEdit = (a: Assessment) => {
+        const normalizedModule = normalizeAssessmentModule(a.module || DEFAULT_ASSESSMENT_MODULE);
         setEditingId(a.id);
         setFormData({
             title: a.title,
@@ -86,8 +99,19 @@ export default function AdminAssessments() {
             schedule: a.schedule,
             description: a.description || "",
             college: (a.college as CollegeLevel) || "ALL",
+            module: normalizedModule,
+            submodule: a.submodule || getSubmodulesForModule(normalizedModule)[0],
         });
         setIsModalOpen(true);
+    };
+
+    const handleModuleChange = (module: AssessmentModule) => {
+        const nextSubmodules = getSubmodulesForModule(module);
+        setFormData({
+            ...formData,
+            module,
+            submodule: nextSubmodules[0] || "",
+        });
     };
 
     const handleDelete = async (id: number) => {
@@ -202,6 +226,10 @@ export default function AdminAssessments() {
                                     <Layers className="w-3.5 h-3.5 text-indigo-400" />
                                     College: <span className="text-indigo-600 font-bold">{a.college}</span>
                                 </div>
+                                <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                                    <Layers className="w-3.5 h-3.5 text-violet-400" />
+                                    {a.module} - <span className="text-violet-600 font-bold">{a.submodule}</span>
+                                </div>
                             </div>
 
                             <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
@@ -300,6 +328,32 @@ export default function AdminAssessments() {
                                                 {dynamicColleges.map(c => <option key={c} value={c}>{c}</option>)}
                                             </datalist>
                                         </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-bold text-gray-700">Module</label>
+                                        <select
+                                            value={formData.module}
+                                            onChange={e => handleModuleChange(e.target.value as AssessmentModule)}
+                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white"
+                                        >
+                                            {Object.keys(ASSESSMENT_MODULES).map(moduleName => (
+                                                <option key={moduleName} value={moduleName}>{moduleName}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-bold text-gray-700">Submodule</label>
+                                        <select
+                                            value={formData.submodule}
+                                            onChange={e => setFormData({...formData, submodule: e.target.value})}
+                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all bg-white"
+                                        >
+                                            {getSubmodulesForModule(formData.module).map(submodule => (
+                                                <option key={submodule} value={submodule}>{submodule}</option>
+                                            ))}
+                                        </select>
                                     </div>
 
                                     <div className="space-y-1.5">

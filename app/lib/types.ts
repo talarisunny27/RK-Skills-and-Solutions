@@ -21,6 +21,8 @@ export interface Assessment {
     image?: string;
     description: string;
     college: CollegeLevel;
+    module: string;
+    submodule: string;
 }
 
 export interface Question {

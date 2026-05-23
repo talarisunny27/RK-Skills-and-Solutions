@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { DashboardStats } from "@/app/lib/types";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+
 export async function GET() {
     try {
         const { userId } = await auth();
@@ -19,7 +21,7 @@ export async function GET() {
 
                 const college = (user.publicMetadata?.college as string) || "TKR College";
 
-                await fetch("http://localhost:8080/api/v1/users/sync", {
+                await fetch(`${API_BASE_URL}/api/v1/users/sync`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ id: userId, email, name, college }),
@@ -31,7 +33,7 @@ export async function GET() {
         }
 
         const response = await fetch(
-            `http://localhost:8080/api/v1/dashboard/${userId}`,
+            `${API_BASE_URL}/api/v1/dashboard/${userId}`,
             {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
@@ -46,7 +48,12 @@ export async function GET() {
         const stats: DashboardStats = await response.json();
         return NextResponse.json(stats);
     } catch (error: any) {
-        console.error("[dashboard] Error:", error.message);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        const message =
+            error?.cause?.code === "ECONNREFUSED"
+                ? `Backend unavailable at ${API_BASE_URL}`
+                : error?.message || "Unknown dashboard error";
+
+        console.error("[dashboard] Error:", error);
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

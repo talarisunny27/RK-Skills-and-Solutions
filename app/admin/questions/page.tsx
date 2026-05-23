@@ -6,10 +6,18 @@ import {
     CheckCircle2, AlertCircle, X, RefreshCw, FileText, ChevronDown
 } from "lucide-react";
 import { Assessment, ExamQuestion } from "@/app/lib/types";
+import {
+    ASSESSMENT_MODULES,
+    AssessmentModule,
+    DEFAULT_ASSESSMENT_MODULE,
+    getSubmodulesForModule,
+} from "@/app/lib/assessment-modules";
 
 export default function AdminQuestions() {
     const [assessments, setAssessments] = useState<Assessment[]>([]);
     const [selectedAssessmentId, setSelectedAssessmentId] = useState<number | null>(null);
+    const [selectedModule, setSelectedModule] = useState<AssessmentModule>(DEFAULT_ASSESSMENT_MODULE);
+    const [selectedSubmodule, setSelectedSubmodule] = useState<string>(getSubmodulesForModule(DEFAULT_ASSESSMENT_MODULE)[0]);
     const [questions, setQuestions] = useState<ExamQuestion[]>([]);
     const [loadingQ, setLoadingQ] = useState(false);
 
@@ -32,6 +40,12 @@ export default function AdminQuestions() {
             .catch(() => {});
     }, []);
 
+    const filteredAssessments = assessments.filter(
+        (assessment) =>
+            assessment.module === selectedModule &&
+            assessment.submodule === selectedSubmodule
+    );
+
     useEffect(() => {
         if (!selectedAssessmentId) return;
         setLoadingQ(true);
@@ -41,6 +55,12 @@ export default function AdminQuestions() {
             .catch(() => setQuestions([]))
             .finally(() => setLoadingQ(false));
     }, [selectedAssessmentId]);
+
+    useEffect(() => {
+        setSelectedAssessmentId(null);
+        setQuestions([]);
+        setUploadResult(null);
+    }, [selectedModule, selectedSubmodule]);
 
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault(); setDragOver(false);
@@ -82,6 +102,12 @@ export default function AdminQuestions() {
         d === "Hard" ? "bg-rose-50 text-rose-600 border border-rose-100" :
         "bg-amber-50 text-amber-600 border border-amber-100";
 
+    const handleModuleChange = (moduleName: AssessmentModule) => {
+        const nextSubmodules = getSubmodulesForModule(moduleName);
+        setSelectedModule(moduleName);
+        setSelectedSubmodule(nextSubmodules[0] || "");
+    };
+
     return (
         <div className="space-y-8">
             {/* Header */}
@@ -103,9 +129,43 @@ export default function AdminQuestions() {
                 </div>
 
                 <div className="p-6 space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">1. Choose Module</label>
+                            <div className="relative">
+                                <select
+                                    value={selectedModule}
+                                    onChange={e => handleModuleChange(e.target.value as AssessmentModule)}
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none"
+                                >
+                                    {Object.keys(ASSESSMENT_MODULES).map(moduleName => (
+                                        <option key={moduleName} value={moduleName}>{moduleName}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">2. Choose Submodule</label>
+                            <div className="relative">
+                                <select
+                                    value={selectedSubmodule}
+                                    onChange={e => setSelectedSubmodule(e.target.value)}
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none"
+                                >
+                                    {getSubmodulesForModule(selectedModule).map(submodule => (
+                                        <option key={submodule} value={submodule}>{submodule}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Assessment Selector */}
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">1. Select Assessment</label>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">3. Select Assessment</label>
                         <div className="relative">
                             <select
                                 value={selectedAssessmentId ?? ""}
@@ -113,17 +173,22 @@ export default function AdminQuestions() {
                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none"
                             >
                                 <option value="">-- Choose an assessment --</option>
-                                {assessments.map(a => (
+                                {filteredAssessments.map(a => (
                                     <option key={a.id} value={a.id}>{a.title} ({a.type})</option>
                                 ))}
                             </select>
                             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                         </div>
+                        {filteredAssessments.length === 0 && (
+                            <p className="text-xs text-amber-600">
+                                No assessments found for {selectedModule} / {selectedSubmodule}. Create or edit an assessment first.
+                            </p>
+                        )}
                     </div>
 
                     {/* File Drop Zone */}
                     <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">2. Choose File</label>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">4. Choose File</label>
                         <div
                             onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                             onDragLeave={() => setDragOver(false)}

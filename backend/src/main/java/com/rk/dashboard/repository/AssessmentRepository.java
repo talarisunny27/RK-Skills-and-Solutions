@@ -15,6 +15,10 @@ import static com.rk.dashboard.jooq.tables.UserAttempts.USER_ATTEMPTS;
 public class AssessmentRepository {
 
     private final DSLContext dsl;
+    private static final org.jooq.Field<String> MODULE_FIELD =
+        org.jooq.impl.DSL.field(org.jooq.impl.DSL.name("module_name"), String.class);
+    private static final org.jooq.Field<String> SUBMODULE_FIELD =
+        org.jooq.impl.DSL.field(org.jooq.impl.DSL.name("submodule_name"), String.class);
 
     public AssessmentRepository(DSLContext dsl) {
         this.dsl = dsl;
@@ -35,7 +39,9 @@ public class AssessmentRepository {
                     .otherwise("Not Attempted").as("status"),
                 org.jooq.impl.DSL.val("").as("image"),
                 ASSESSMENTS.DESCRIPTION,
-                ASSESSMENTS.COLLEGE
+                ASSESSMENTS.COLLEGE,
+                MODULE_FIELD.as("module"),
+                SUBMODULE_FIELD.as("submodule")
             )
             .from(ASSESSMENTS)
             .leftJoin(USER_ATTEMPTS)
@@ -58,7 +64,9 @@ public class AssessmentRepository {
                 org.jooq.impl.DSL.val("Upcoming").as("status"),
                 org.jooq.impl.DSL.val("").as("image"),
                 ASSESSMENTS.DESCRIPTION,
-                ASSESSMENTS.COLLEGE
+                ASSESSMENTS.COLLEGE,
+                MODULE_FIELD.as("module"),
+                SUBMODULE_FIELD.as("submodule")
             )
             .from(ASSESSMENTS)
             .orderBy(ASSESSMENTS.ID.desc())
@@ -84,17 +92,24 @@ public class AssessmentRepository {
         String schedule    = (String) body.getOrDefault("schedule", "Anytime");
         String description = (String) body.getOrDefault("description", "");
         String college     = (String) body.getOrDefault("college", "ALL");
+        String module      = (String) body.getOrDefault("module", "VERBAL ABILITY");
+        String submodule   = (String) body.getOrDefault("submodule", "Basic Level");
 
-        int id = dsl.insertInto(ASSESSMENTS,
-                ASSESSMENTS.TITLE, ASSESSMENTS.TYPE, ASSESSMENTS.DATE,
-                ASSESSMENTS.DURATION, ASSESSMENTS.SCHEDULE,
-                ASSESSMENTS.DESCRIPTION, ASSESSMENTS.COLLEGE)
-            .values(title, type, date, duration, schedule, description, college)
+        int id = dsl.insertInto(ASSESSMENTS)
+            .set(ASSESSMENTS.TITLE, title)
+            .set(ASSESSMENTS.TYPE, type)
+            .set(ASSESSMENTS.DATE, date)
+            .set(ASSESSMENTS.DURATION, duration)
+            .set(ASSESSMENTS.SCHEDULE, schedule)
+            .set(ASSESSMENTS.DESCRIPTION, description)
+            .set(ASSESSMENTS.COLLEGE, college)
+            .set(MODULE_FIELD, module)
+            .set(SUBMODULE_FIELD, submodule)
             .returning(ASSESSMENTS.ID)
             .fetchOne()
             .get(ASSESSMENTS.ID);
 
-        return new AssessmentDTO(id, title, type, date, duration, schedule, "Upcoming", "", description, college);
+        return new AssessmentDTO(id, title, type, date, duration, schedule, "Upcoming", "", description, college, module, submodule);
     }
 
     // ── Admin: update ─────────────────────────────────────────────────────
@@ -109,6 +124,8 @@ public class AssessmentRepository {
             .set(ASSESSMENTS.SCHEDULE,    (String) body.getOrDefault("schedule", "Anytime"))
             .set(ASSESSMENTS.DESCRIPTION, (String) body.getOrDefault("description", ""))
             .set(ASSESSMENTS.COLLEGE,     (String) body.getOrDefault("college", "ALL"))
+            .set(MODULE_FIELD,            (String) body.getOrDefault("module", "VERBAL ABILITY"))
+            .set(SUBMODULE_FIELD,         (String) body.getOrDefault("submodule", "Basic Level"))
             .where(ASSESSMENTS.ID.eq(id));
         return set.execute();
     }
