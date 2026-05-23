@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Assessment } from "@/app/lib/types";
 import { auth } from "@clerk/nextjs/server";
+import { backendUrl, getBackendErrorMessage } from "@/app/lib/server-api";
 
 export async function GET() {
     try {
@@ -12,7 +13,7 @@ export async function GET() {
 
         const college = (sessionClaims?.metadata as any)?.college || (sessionClaims as any)?.publicMetadata?.college || "ALL";
 
-        const response = await fetch(`http://localhost:8080/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`, {
+        const response = await fetch(backendUrl(`/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -27,6 +28,9 @@ export async function GET() {
         const assessments: Assessment[] = await response.json();
         return NextResponse.json(assessments);
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json(
+            { error: getBackendErrorMessage(error, "Failed to load assessments") },
+            { status: 500 }
+        );
     }
 }
