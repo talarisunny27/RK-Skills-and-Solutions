@@ -10,5 +10,7 @@ public record AssessmentDTO(
     String status,
     String image,
     String description,
-    String college
+    String college,
+    String module,
+    String submodule
 ) {}
