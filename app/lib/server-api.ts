@@ -1,7 +1,6 @@
-const DEFAULT_API_BASE_URL = "http://13.211.147.134:8080";
+import { getApiBaseUrl } from "@/app/lib/env";
 
-export const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || DEFAULT_API_BASE_URL;
+export const API_BASE_URL = getApiBaseUrl();
 
 export function backendUrl(path: string): string {
     const normalizedBaseUrl = API_BASE_URL.endsWith("/")

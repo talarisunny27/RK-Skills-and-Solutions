@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import { DM_Sans, Syne, Space_Mono } from 'next/font/google';
 import './globals.css';
+import { getClerkPublicConfig } from './lib/env';
 import { Providers } from './providers';
 import SyncUser from './components/SyncUser';
 import CollegeOnboarding from './components/CollegeOnboarding';
@@ -37,6 +38,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const clerkConfig = getClerkPublicConfig();
+
   return (
     <html lang="en" className={`${dmSans.variable} ${syne.variable} ${spaceMono.variable}`}>
       <head>
@@ -44,7 +47,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className="antialiased bg-[#060913] text-[#EAF2FF] min-h-screen">
-        <Providers>
+        <Providers clerkConfig={clerkConfig}>
           <SyncUser />
           <CollegeOnboarding />
           {children}
