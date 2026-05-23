@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { backendUrl, getBackendErrorMessage } from "../../../lib/server-api";
+import { backendUrl, getBackendErrorMessage } from "@/app/lib/server-api";
 
 // Admin uploads a question paper (Excel or PDF) for a specific assessment.
 // Streams the file directly to the Java backend.

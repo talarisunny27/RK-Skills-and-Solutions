@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { backendUrl, getBackendErrorMessage } from "../../lib/server-api";
+import { backendUrl, getBackendErrorMessage } from "@/app/lib/server-api";
 
 async function checkAdmin() {
     const { sessionClaims } = await auth();

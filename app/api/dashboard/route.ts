@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { DashboardStats } from "@/app/lib/types";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { backendUrl, getBackendErrorMessage } from "../lib/server-api";
+import { backendUrl, getBackendErrorMessage } from "@/app/lib/server-api";
 
 export async function GET() {
     try {
