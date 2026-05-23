@@ -1,6 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { backendUrl, getBackendErrorMessage } from "@/app/lib/server-api";
+import {
+    API_BASE_URL,
+    backendUrl,
+    getBackendErrorDetails,
+    getBackendErrorMessage,
+    readResponsePreview,
+} from "@/app/lib/server-api";
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,22 +15,39 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json();
         const { email, name, college } = body;
+        const url = backendUrl("/api/v1/users/sync");
 
-        const backendResponse = await fetch(backendUrl("/api/v1/users/sync"), {
+        const backendResponse = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: userId, email, name, college }),
         });
 
         if (!backendResponse.ok) {
-            throw new Error(`Backend sync failed: ${backendResponse.status}`);
+            return NextResponse.json(
+                {
+                    error: `Backend sync failed: ${backendResponse.status}`,
+                    upstream: {
+                        url,
+                        status: backendResponse.status,
+                        body: await readResponsePreview(backendResponse),
+                    },
+                },
+                { status: 502 }
+            );
         }
 
         return NextResponse.json({ success: true });
     } catch (error: any) {
         console.error("User sync error:", error);
         return NextResponse.json(
-            { error: getBackendErrorMessage(error, "Failed to sync user") },
+            {
+                error: getBackendErrorMessage(error, "Failed to sync user"),
+                upstream: {
+                    baseUrl: API_BASE_URL,
+                    cause: getBackendErrorDetails(error),
+                },
+            },
             { status: 500 }
         );
     }

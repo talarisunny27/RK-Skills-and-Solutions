@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { Assessment } from "@/app/lib/types";
 import { auth } from "@clerk/nextjs/server";
-import { backendUrl, getBackendErrorMessage } from "@/app/lib/server-api";
+import {
+    API_BASE_URL,
+    backendUrl,
+    getBackendErrorDetails,
+    getBackendErrorMessage,
+    readResponsePreview,
+} from "@/app/lib/server-api";
 
 export async function GET() {
     try {
@@ -12,8 +18,9 @@ export async function GET() {
         }
 
         const college = (sessionClaims?.metadata as any)?.college || (sessionClaims as any)?.publicMetadata?.college || "ALL";
+        const url = backendUrl(`/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`);
 
-        const response = await fetch(backendUrl(`/api/v1/assessments/${userId}?college=${encodeURIComponent(college)}`), {
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -22,14 +29,30 @@ export async function GET() {
         });
 
         if (!response.ok) {
-            throw new Error(`Backend returned ${response.status}`);
+            return NextResponse.json(
+                {
+                    error: `Backend returned ${response.status}`,
+                    upstream: {
+                        url,
+                        status: response.status,
+                        body: await readResponsePreview(response),
+                    },
+                },
+                { status: 502 }
+            );
         }
 
         const assessments: Assessment[] = await response.json();
         return NextResponse.json(assessments);
     } catch (error: any) {
         return NextResponse.json(
-            { error: getBackendErrorMessage(error, "Failed to load assessments") },
+            {
+                error: getBackendErrorMessage(error, "Failed to load assessments"),
+                upstream: {
+                    baseUrl: API_BASE_URL,
+                    cause: getBackendErrorDetails(error),
+                },
+            },
             { status: 500 }
         );
     }
