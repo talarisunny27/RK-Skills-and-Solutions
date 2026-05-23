@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+const DEFAULT_API_BASE_URL = "http://13.211.147.134:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || DEFAULT_API_BASE_URL;
 
 /**
  * Server-side helper to call the Spring Boot API
@@ -19,9 +20,13 @@ export async function apiFetch<T>(
     }
     headers.set("Content-Type", "application/json");
 
+    const normalizedBaseUrl = API_BASE_URL.endsWith("/")
+        ? API_BASE_URL.slice(0, -1)
+        : API_BASE_URL;
+
     const url = endpoint.startsWith("http")
         ? endpoint
-        : `${API_BASE_URL}${endpoint}`;
+        : `${normalizedBaseUrl}${endpoint}`;
 
     const response = await fetch(url, {
         ...options,

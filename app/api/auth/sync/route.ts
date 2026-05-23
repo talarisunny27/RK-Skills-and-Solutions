@@ -39,13 +39,25 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ success: true });
     } catch (error: any) {
+        const message = getBackendErrorMessage(error, "Failed to sync user");
+        const details = getBackendErrorDetails(error);
+
+        if (details?.code === "ECONNREFUSED") {
+            console.warn("User sync skipped because backend is unavailable:", error);
+            return NextResponse.json({
+                success: true,
+                synced: false,
+                warning: message,
+            });
+        }
+
         console.error("User sync error:", error);
         return NextResponse.json(
             {
-                error: getBackendErrorMessage(error, "Failed to sync user"),
+                error: message,
                 upstream: {
                     baseUrl: API_BASE_URL,
-                    cause: getBackendErrorDetails(error),
+                    cause: details,
                 },
             },
             { status: 500 }

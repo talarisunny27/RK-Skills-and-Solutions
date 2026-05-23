@@ -1,8 +1,14 @@
+const DEFAULT_API_BASE_URL = "http://13.211.147.134:8080";
+
 export const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+    process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || DEFAULT_API_BASE_URL;
 
 export function backendUrl(path: string): string {
-    return `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+    const normalizedBaseUrl = API_BASE_URL.endsWith("/")
+        ? API_BASE_URL.slice(0, -1)
+        : API_BASE_URL;
+
+    return `${normalizedBaseUrl}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 export async function readResponsePreview(response: Response): Promise<string> {
