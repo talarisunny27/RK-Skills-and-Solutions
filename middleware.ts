@@ -1,6 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
 const isPublicRoute = createRouteMatcher([
     '/',
     '/sign-in(.*)',
@@ -42,6 +45,9 @@ export default clerkMiddleware(async (auth, req) => {
             return NextResponse.redirect(new URL(redirectUrl, req.url));
         }
     }
+}, {
+    secretKey: clerkSecretKey,
+    publishableKey: clerkPublishableKey,
 });
 
 export const config = {
