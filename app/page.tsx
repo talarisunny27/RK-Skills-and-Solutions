@@ -105,7 +105,7 @@ export default function Home() {
 
           {/* Desktop Links */}
           <div className="hidden lg:flex items-center gap-10 text-gray-700 font-medium">
-            <a href="#features" className="hover:text-indigo-600 transition-colors duration-300">Features</a>
+            <a href="#platform-features" className="hover:text-indigo-600 transition-colors duration-300">Features</a>
             <a href="#team" className="hover:text-indigo-600 transition-colors duration-300">Team</a>
             <a href="#contact" className="hover:text-indigo-600 transition-colors duration-300">Contact</a>
             <SignedIn>
@@ -143,7 +143,7 @@ export default function Home() {
         {isMobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg absolute w-full max-h-[calc(100vh-80px)] overflow-y-auto">
             <div className="px-4 py-6 space-y-4 flex flex-col">
-              <a href="#features" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
+              <a href="#platform-features" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
               <a href="#team" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Team</a>
               <a href="#contact" className="block text-gray-700 text-lg font-medium hover:text-indigo-600 px-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
 
@@ -220,12 +220,12 @@ export default function Home() {
                     Go to Dashboard →
                   </Link>
                 </SignedIn>
-                <button className="px-10 py-5 text-xl font-bold rounded-xl border-2 border-blue-600 text-blue-700 hover:bg-blue-50 transition-all">
+                <a href="#platform-features" className="px-10 py-5 text-xl font-bold rounded-xl border-2 border-blue-600 text-blue-700 hover:bg-blue-50 transition-all">
                   Platform Features
-                </button>
-                <button className="px-10 py-5 text-xl font-bold rounded-xl bg-gray-100 text-gray-800 hover:bg-gray-200 transition-all">
+                </a>
+                <a href="#contact" className="px-10 py-5 text-xl font-bold rounded-xl bg-gray-100 text-gray-800 hover:bg-gray-200 transition-all">
                   Talk to Counselor
-                </button>
+                </a>
               </motion.div>
 
               <motion.div
@@ -399,19 +399,19 @@ export default function Home() {
             </div>
 
             <div className="flex gap-4">
-              <button className="px-8 py-4 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
+              <Link href="/sign-up" className="px-8 py-4 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
                 Start Free Trial →
-              </button>
-              <button className="px-8 py-4 rounded-xl font-bold border border-blue-500 text-blue-600 hover:bg-blue-50 transition-all">
+              </Link>
+              <a href="#contact" className="px-8 py-4 rounded-xl font-bold border border-blue-500 text-blue-600 hover:bg-blue-50 transition-all">
                 Request a Demo
-              </button>
+              </a>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── Training Focus ── (light theme) */}
-      <section ref={addToRefs} className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <section ref={addToRefs} id="training-focus" className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           {/* Top badge + headline */}
           <div className="text-center mb-12 md:mb-16">
@@ -586,9 +586,9 @@ export default function Home() {
                 <p className="text-gray-600 mb-6">
                   Get duration + module plan based on your batch.
                 </p>
-                <button className="px-8 py-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md hover:shadow-lg">
+                <a href="#contact" className="px-8 py-4 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-md hover:shadow-lg inline-block text-center">
                   Request plan →
-                </button>
+                </a>
               </motion.div>
             </motion.div>
           </div>
@@ -614,7 +614,7 @@ export default function Home() {
       </section>
 
       {/* ── Student Journey  */}
-      <section ref={addToRefs} className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section ref={addToRefs} id="student-journey" className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           {/* Top badge + headline */}
           <div className="text-center mb-12 md:mb-16">
@@ -743,9 +743,9 @@ export default function Home() {
                 transition={{ delay: 0.4 }}
                 className="rounded-3xl bg-gradient-to-r from-orange-500 to-orange-600 p-10 text-center shadow-xl"
               >
-                <button className="px-10 py-5 text-xl font-bold rounded-xl bg-white text-orange-700 hover:bg-orange-50 transition-all shadow-lg">
+                <a href="#contact" className="inline-block px-10 py-5 text-xl font-bold rounded-xl bg-white text-orange-700 hover:bg-orange-50 transition-all shadow-lg">
                   Talk to us for onboarding
-                </button>
+                </a>
               </motion.div>
             </motion.div>
           </div>
@@ -878,12 +878,12 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-6 justify-center mt-12">
-                  <button className="px-10 py-5 text-lg font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
+                  <a href="#contact" className="px-10 py-5 text-lg font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-md hover:shadow-lg inline-block text-center">
                     Contact
-                  </button>
-                  <button className="px-10 py-5 text-lg font-bold rounded-xl border-2 border-indigo-500 text-indigo-600 hover:bg-indigo-50 transition-all">
+                  </a>
+                  <a href="#reviews" className="px-10 py-5 text-lg font-bold rounded-xl border-2 border-indigo-500 text-indigo-600 hover:bg-indigo-50 transition-all inline-block text-center">
                     View Testimonials
-                  </button>
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -1024,7 +1024,12 @@ export default function Home() {
                   <p className="text-gray-600 text-sm leading-relaxed">{member.bio}</p>
 
                   <div className="mt-6 flex justify-center gap-4 opacity-70 group-hover:opacity-100 transition-opacity">
-                    <a href="#" className="text-gray-500 hover:text-sky-600 transition-colors">
+                    <a
+                      href="https://www.linkedin.com/company/rk-skills-and-solutions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500 hover:text-sky-600 transition-colors"
+                    >
                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                       </svg>
@@ -1043,7 +1048,7 @@ export default function Home() {
 
 
       {/* ── Student Reviews */}
-      <section ref={addToRefs} className="py-20 px-6 bg-white overflow-hidden">
+      <section ref={addToRefs} id="reviews" className="py-20 px-6 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto">
           {/* Top badge + headline */}
           <div className="text-center mb-16">
@@ -1636,7 +1641,7 @@ export default function Home() {
               <h4 className="text-xl font-bold text-gray-900 mb-6">Quick Links</h4>
               <ul className="space-y-4 text-gray-700">
                 <li>
-                  <a href="#platform-overview" className="hover:text-orange-600 transition-colors flex items-center gap-2">
+                  <a href="#platform-features" className="hover:text-orange-600 transition-colors flex items-center gap-2">
                     → Platform Overview
                   </a>
                 </li>
@@ -1651,7 +1656,7 @@ export default function Home() {
                   </a>
                 </li>
                 <li>
-                  <a href="#core-team" className="hover:text-orange-600 transition-colors flex items-center gap-2">
+                  <a href="#team" className="hover:text-orange-600 transition-colors flex items-center gap-2">
                     → Core Team
                   </a>
                 </li>
@@ -1714,9 +1719,6 @@ export default function Home() {
                   </a>
                   <a href="https://wa.me/918341391285" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
                     <MessageCircle className="w-5 h-5" />
-                  </a>
-                  <a href="#" className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 hover:bg-gray-200 transition-colors">
-                    📍
                   </a>
                 </div>
               </div>
